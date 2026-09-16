@@ -1,0 +1,216 @@
+[
+  {
+    "대학명": "충남대학교",
+    "상태": "성공",
+    "다운로드": [
+      "/Users/code/projects/university/raw/univ_dist/충남대학교/입시결과_수시모집_2026.pdf"
+    ],
+    "비고": ""
+  },
+  {
+    "대학명": "충북대학교",
+    "상태": "성공",
+    "다운로드": [
+      "/Users/code/projects/university/raw/univ_dist/충북대학교/입시결과_수시_교과전형_2026.pdf",
+      "/Users/code/projects/university/raw/univ_dist/충북대학교/입시결과_수시_지역인재전형_2026.pdf",
+      "/Users/code/projects/university/raw/univ_dist/충북대학교/입시결과_수시_종합I전형_2026.pdf"
+    ],
+    "비고": "egov FileDown.do URL 패턴으로 다운로드"
+  },
+  {
+    "대학명": "칼빈대학교",
+    "상태": "미발견",
+    "다운로드": [],
+    "비고": "입시홈페이지 메뉴(전형계획/수시/정시/입학안내)에 입시결과 게시판 없음, menu_no=1075 게시판은 본교 홈으로 리다이렉트"
+  },
+  {
+    "대학명": "평택대학교",
+    "상태": "성공",
+    "다운로드": [
+      "/Users/code/projects/university/raw/univ_dist/평택대학교/입시결과_정시모집_2026.pdf",
+      "/Users/code/projects/university/raw/univ_dist/평택대학교/입시결과_편입학모집_2026.pdf"
+    ],
+    "비고": ""
+  },
+  {
+    "대학명": "한국공학대학교",
+    "상태": "성공",
+    "다운로드": [
+      "/Users/code/projects/university/raw/univ_dist/한국공학대학교/입시결과_정시모집_2026.pdf",
+      "/Users/code/projects/university/raw/univ_dist/한국공학대학교/입시결과_수시모집_2026.pdf"
+    ],
+    "비고": ""
+  },
+  {
+    "대학명": "한국교원대학교",
+    "상태": "성공",
+    "다운로드": [
+      "/Users/code/projects/university/raw/univ_dist/한국교원대학교/입시결과_수시_2026.pdf",
+      "/Users/code/projects/university/raw/univ_dist/한국교원대학교/입시결과_정시_2026.pdf"
+    ],
+    "비고": ""
+  },
+  {
+    "대학명": "한국기술교육대학교",
+    "상태": "성공",
+    "다운로드": [
+      "/Users/code/projects/university/raw/univ_dist/한국기술교육대학교/입시결과_수시_2026.pdf"
+    ],
+    "비고": "정시 입시결과 메뉴 mid 추정 실패, 수시만 확보"
+  },
+  {
+    "대학명": "한국성서대학교",
+    "상태": "미발견",
+    "다운로드": [],
+    "비고": "입시결과 페이지가 HTML 표(경쟁률/석차등급)로만 제공, 다운로드 문서 없음"
+  },
+  {
+    "대학명": "한국외국어대학교",
+    "상태": "성공",
+    "다운로드": [
+      "/Users/code/projects/university/raw/univ_dist/한국외국어대학교/입시결과통계_수시_2027.pdf",
+      "/Users/code/projects/university/raw/univ_dist/한국외국어대학교/입시결과통계_정시_2026.pdf"
+    ],
+    "비고": "fileView.do가 PDF 원문 반환, 페이지 컨텍스트 fetch로 저장"
+  },
+  {
+    "대학명": "한국체육대학교",
+    "상태": "성공",
+    "다운로드": [
+      "/Users/code/projects/university/raw/univ_dist/한국체육대학교/등급분포_수시_최종등록자_2026.xlsx"
+    ],
+    "비고": ""
+  },
+  {
+    "대학명": "한국침례신학대학교",
+    "상태": "성공",
+    "다운로드": [
+      "/Users/code/projects/university/raw/univ_dist/한국침례신학대학교/입시결과_수시_2021.pdf"
+    ],
+    "비고": "전년도 입시결과 게시판에 2021학년도 1건만 존재"
+  },
+  {
+    "대학명": "한국항공대학교",
+    "상태": "성공",
+    "다운로드": [
+      "/Users/code/projects/university/raw/univ_dist/한국항공대학교/입시결과_수시_2026.pdf"
+    ],
+    "비고": ""
+  },
+  {
+    "대학명": "한림대학교",
+    "상태": "성공",
+    "다운로드": [
+      "/Users/code/projects/university/raw/univ_dist/한림대학교/입시결과_수시_2026.pdf",
+      "/Users/code/projects/university/raw/univ_dist/한림대학교/입시결과_수시_2025.pdf"
+    ],
+    "비고": ""
+  },
+  {
+    "대학명": "한서대학교",
+    "상태": "성공",
+    "다운로드": [
+      "/Users/code/projects/university/raw/univ_dist/한서대학교/등급분포_수시_최종입학자_2026.pdf"
+    ],
+    "비고": ""
+  },
+  {
+    "대학명": "한성대학교",
+    "상태": "성공",
+    "다운로드": [
+      "/Users/code/projects/university/raw/univ_dist/한성대학교/입시결과_수시_학생부등급_2026.pdf"
+    ],
+    "비고": "첨부클릭 다운로드 이벤트로 저장(파일명은 xlsx 뷰어였으나 실제 PDF로 저장됨)"
+  },
+  {
+    "대학명": "한세대학교",
+    "상태": "성공",
+    "다운로드": [
+      "/Users/code/projects/university/raw/univ_dist/한세대학교/등급분포_수시_지원현황_2026.pdf",
+      "/Users/code/projects/university/raw/univ_dist/한세대학교/입시결과_수시_충원율_2026.pdf"
+    ],
+    "비고": ""
+  },
+  {
+    "대학명": "한신대학교",
+    "상태": "성공",
+    "다운로드": [
+      "/Users/code/projects/university/raw/univ_dist/한신대학교/입시결과_수시_2026.pdf"
+    ],
+    "비고": ""
+  },
+  {
+    "대학명": "한양대학교",
+    "상태": "성공",
+    "다운로드": [
+      "/Users/code/projects/university/raw/univ_dist/한양대학교/입시결과_전형별_2024-2026.pdf"
+    ],
+    "비고": "첨부버튼 클릭→다운로드 이벤트 저장"
+  },
+  {
+    "대학명": "한양대학교(ERICA)",
+    "상태": "성공",
+    "다운로드": [
+      "/Users/code/projects/university/raw/univ_dist/한양대학교(ERICA)/입시결과_수시_2024-2026.pdf"
+    ],
+    "비고": "페이지 컨텍스트 fetch로 저장(referer 세션 필요)"
+  },
+  {
+    "대학명": "협성대학교",
+    "상태": "미발견",
+    "다운로드": [],
+    "비고": "입시결과는 입학상담솔루션(cs.u-is.co.kr) 폼 입력 후 조회 방식, 직접 문서 없음"
+  },
+  {
+    "대학명": "호남대학교",
+    "상태": "성공",
+    "다운로드": [
+      "/Users/code/projects/university/raw/univ_dist/호남대학교/입시결과_수시_2026.pdf"
+    ],
+    "비고": ""
+  },
+  {
+    "대학명": "호남신학대학교",
+    "상태": "미발견",
+    "다운로드": [],
+    "비고": "입시자료 게시판에 입학원서/모집요강만 존재, 입시결과 문서 없음"
+  },
+  {
+    "대학명": "호서대학교",
+    "상태": "미발견",
+    "다운로드": [],
+    "비고": "입시결과가 페이지 내 HTML 표(경쟁률/최종등록자 컷)로만 제공, 문서 파일 없음"
+  },
+  {
+    "대학명": "호원대학교",
+    "상태": "성공",
+    "다운로드": [
+      "/Users/code/projects/university/raw/univ_dist/호원대학교/등급분포_내신수능등급및경쟁률_2026.xlsx"
+    ],
+    "비고": "실제 파일은 XLSX"
+  },
+  {
+    "대학명": "홍익대학교",
+    "상태": "성공",
+    "다운로드": [
+      "/Users/code/projects/university/raw/univ_dist/홍익대학교/입시결과_수시_2026.zip",
+      "/Users/code/projects/university/raw/univ_dist/홍익대학교/등급분포_학생부수능표준점수평균_2026.zip"
+    ],
+    "비고": "서울/세종 캠퍼스 통합 자료, 배치의 본교/제2캠퍼스 항목 공용"
+  },
+  {
+    "대학명": "홍익대학교[제2캠퍼스]",
+    "상태": "성공",
+    "다운로드": [
+      "/Users/code/projects/university/raw/univ_dist/홍익대학교/입시결과_수시_2026.zip",
+      "/Users/code/projects/university/raw/univ_dist/홍익대학교/등급분포_학생부수능표준점수평균_2026.zip"
+    ],
+    "비고": "본교와 동일 URL의 통합 자료(세종캠퍼스 포함)"
+  },
+  {
+    "대학명": "화성의과학대학교",
+    "상태": "미발견",
+    "다운로드": [],
+    "비고": "입시홈페이지(수시/정시/편입/인포)에 입시결과·성적현황 메뉴 없음, 모집요강만 제공"
+  }
+]

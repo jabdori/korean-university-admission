@@ -1,0 +1,239 @@
+[
+  {
+    "대학명": "대구예술대학교[본교]",
+    "상태": "성공",
+    "다운로드": [
+      "/Users/code/projects/university/raw/univ_dist/대구예술대학교/입시결과_2022수시_마감현황.jpg"
+    ],
+    "비고": "전년도 입시결과 게시글 내 이미지(마감현황) 원본"
+  },
+  {
+    "대학명": "대구한의대학교[본교]",
+    "상태": "성공",
+    "다운로드": [
+      "/Users/code/projects/university/raw/univ_dist/대구한의대학교/입시결과_2026수시.pdf"
+    ],
+    "비고": "전년도 입시결과(수시모집) 첨부파일"
+  },
+  {
+    "대학명": "대신대학교[본교]",
+    "상태": "미발견",
+    "다운로드": [],
+    "비고": "입시 사이트에 입시결과/등급분포성 메뉴 없음(모집요강·공지·Q&A만 존재)"
+  },
+  {
+    "대학명": "대전가톨릭대학교[본교]",
+    "상태": "미발견",
+    "다운로드": [],
+    "비고": "입시자료실은 모집요강·시행계획 위주, 입시결과/경쟁률 자료 없음(게시판 검색 확인)"
+  },
+  {
+    "대학명": "대전대학교[본교]",
+    "상태": "성공",
+    "다운로드": [
+      "/Users/code/projects/university/raw/univ_dist/대전대학교/입시결과_수시_2024-2026.pdf",
+      "/Users/code/projects/university/raw/univ_dist/대전대학교/입시결과_정시_2026.pdf",
+      "/Users/code/projects/university/raw/univ_dist/대전대학교/입시결과_정시_성적분석_2024-2026.pdf"
+    ],
+    "비고": "수시·정시 입시결과(성적분석자료) PDF"
+  },
+  {
+    "대학명": "대진대학교[본교]",
+    "상태": "성공",
+    "다운로드": [
+      "/Users/code/projects/university/raw/univ_dist/대진대학교/전형결과_수시_2026.pdf",
+      "/Users/code/projects/university/raw/univ_dist/대진대학교/전형결과_정시_2026.pdf"
+    ],
+    "비고": "전형자료_입시결과 게시판(수시/정시/편입 전형결과)"
+  },
+  {
+    "대학명": "덕성여자대학교[본교]",
+    "상태": "성공",
+    "다운로드": [
+      "/Users/code/projects/university/raw/univ_dist/덕성여자대학교/입시결과_2024-2026.pdf"
+    ],
+    "비고": "입시결과 게시판 최근 3개년 입시결과"
+  },
+  {
+    "대학명": "동국대학교(WISE)[분교]",
+    "상태": "성공",
+    "다운로드": [
+      "/Users/code/projects/university/raw/univ_dist/동국대학교_WISE/입시결과_수시_2026.pdf"
+    ],
+    "비고": "공지사항의 2026 수시 전형결과 페이지를 PDF로 저장(첨부파일 없이 표 형태 게시)"
+  },
+  {
+    "대학명": "동덕여자대학교[본교]",
+    "상태": "성공",
+    "다운로드": [
+      "/Users/code/projects/university/raw/univ_dist/동덕여자대학교/입시결과_정시_합격자수능통계_2026.pdf"
+    ],
+    "비고": "입시결과 게시판(2026 합격자 통계 정시/수시)"
+  },
+  {
+    "대학명": "동명대학교[본교]",
+    "상태": "성공",
+    "다운로드": [
+      "/Users/code/projects/university/raw/univ_dist/동명대학교/입시결과_수시_2026.pdf",
+      "/Users/code/projects/university/raw/univ_dist/동명대학교/입시결과_수시_2026.xlsx"
+    ],
+    "비고": "전년도 입시결과 게시판(PDF/XLSX). 브라우저 다운로드로 ~/Downloads에 사본 생성됨"
+  },
+  {
+    "대학명": "동서대학교[본교]",
+    "상태": "성공",
+    "다운로드": [
+      "/Users/code/projects/university/raw/univ_dist/동서대학교/입시결과_수시정시_2026.xlsx"
+    ],
+    "비고": "입시결과 게시글 첨부 XLSX(2026 수시·정시)"
+  },
+  {
+    "대학명": "동신대학교[본교]",
+    "상태": "성공",
+    "다운로드": [
+      "/Users/code/projects/university/raw/univ_dist/동신대학교/입시결과_수시_2026.pdf",
+      "/Users/code/projects/university/raw/univ_dist/동신대학교/입시결과_정시_2026.pdf"
+    ],
+    "비고": "전년도 입시결과(수시/정시) PDF"
+  },
+  {
+    "대학명": "동양대학교[본교]",
+    "상태": "성공",
+    "다운로드": [
+      "/Users/code/projects/university/raw/univ_dist/동양대학교/입시결과_수시_2026.pdf"
+    ],
+    "비고": "전년도 입시결과 PDF 뷰어(DearFlip) 원본"
+  },
+  {
+    "대학명": "동의대학교[본교]",
+    "상태": "성공",
+    "다운로드": [
+      "/Users/code/projects/university/raw/univ_dist/동의대학교/전형결과_수시_교과실기_2026.pdf",
+      "/Users/code/projects/university/raw/univ_dist/동의대학교/전형결과_수시_종합_2026.pdf"
+    ],
+    "비고": "입시 전형결과 게시판(2026 수시 교과/종합)"
+  },
+  {
+    "대학명": "루터대학교[본교]",
+    "상태": "미발견",
+    "다운로드": [],
+    "비고": "입시 사이트 내 입시결과/경쟁률/통계성 메뉴·링크 없음(수시/정시 페이지 HTML 확인)"
+  },
+  {
+    "대학명": "명지대학교[본교]",
+    "상태": "성공",
+    "다운로드": [
+      "/Users/code/projects/university/raw/univ_dist/명지대학교/입시결과_수시_2026.pdf",
+      "/Users/code/projects/university/raw/univ_dist/명지대학교/입시결과_수시_2026.xlsx"
+    ],
+    "비고": "입시결과 게시판(2026 수시 PDF/XLSX). 제2캠퍼스는 동일 사이트 공용"
+  },
+  {
+    "대학명": "명지대학교[제2캠퍼스]",
+    "상태": "성공",
+    "다운로드": [
+      "/Users/code/projects/university/raw/univ_dist/명지대학교/입시결과_수시_2026.pdf",
+      "/Users/code/projects/university/raw/univ_dist/명지대학교/입시결과_수시_2026.xlsx"
+    ],
+    "비고": "본교와 동일 입시 사이트 공용(용인 캠퍼스 자료 포함)"
+  },
+  {
+    "대학명": "목원대학교[본교]",
+    "상태": "성공",
+    "다운로드": [
+      "/Users/code/projects/university/raw/univ_dist/목원대학교/입시결과_수시_교과전형_2026.pdf",
+      "/Users/code/projects/university/raw/univ_dist/목원대학교/입시결과_수시_종합전형_2026.pdf"
+    ],
+    "비고": "전년도입시결과 페이지(HTML 표)를 PDF로 저장(교과/종합)"
+  },
+  {
+    "대학명": "목포가톨릭대학교[본교]",
+    "상태": "성공",
+    "다운로드": [
+      "/Users/code/projects/university/raw/univ_dist/목포가톨릭대학교/경쟁률_수시_2026.jpg"
+    ],
+    "비고": "지난입시결과 게시판(2026 수시 경쟁률 현황 이미지). 정시 게시판은 boardID 추정 실패"
+  },
+  {
+    "대학명": "백석대학교[본교]",
+    "상태": "성공",
+    "다운로드": [
+      "/Users/code/projects/university/raw/univ_dist/백석대학교/입시결과_경쟁률및등급현황_2026.pdf"
+    ],
+    "비고": "전년도 입시결과(2026 경쟁률·학생부등급현황) 데이터 페이지를 PDF로 저장. 파일 첨부 형식 아님"
+  },
+  {
+    "대학명": "부산가톨릭대학교[본교]",
+    "상태": "성공",
+    "다운로드": [
+      "/Users/code/projects/university/raw/univ_dist/부산가톨릭대학교/입결_수시_학생부교과_2026.pdf",
+      "/Users/code/projects/university/raw/univ_dist/부산가톨릭대학교/입결_수시_학생부종합_2026.pdf"
+    ],
+    "비고": "지난입시결과(수시 교과/종합 입결 PDF 뷰어 원본)"
+  },
+  {
+    "대학명": "부산대학교[본교]",
+    "상태": "성공",
+    "다운로드": [
+      "/Users/code/projects/university/raw/univ_dist/부산대학교/전형결과_2026.pdf"
+    ],
+    "비고": "공지사항의 2026학년도 대학입학전형 결과 안내 PDF"
+  },
+  {
+    "대학명": "부산외국어대학교[본교]",
+    "상태": "성공",
+    "다운로드": [
+      "/Users/code/projects/university/raw/univ_dist/부산외국어대학교/입시결과_수시_80컷_2026.pdf"
+    ],
+    "비고": "전년도 입시결과 게시판(수시 80컷/정시)"
+  },
+  {
+    "대학명": "부산장신대학교[본교]",
+    "상태": "미발견",
+    "다운로드": [],
+    "비고": "입시자료실 게시물 제목 스캔 결과에 입시결과/경쟁률 자료 없음"
+  },
+  {
+    "대학명": "삼육대학교[본교]",
+    "상태": "성공",
+    "다운로드": [
+      "/Users/code/projects/university/raw/univ_dist/삼육대학교/입시결과_수시_2026.pdf",
+      "/Users/code/projects/university/raw/univ_dist/삼육대학교/입시결과_정시_2026.pdf"
+    ],
+    "비고": "입시결과/경쟁률 페이지(HTML 표)를 PDF로 저장(수시/정시)"
+  },
+  {
+    "대학명": "상명대학교[본교]",
+    "상태": "성공",
+    "다운로드": [
+      "/Users/code/projects/university/raw/univ_dist/상명대학교_서울/성적결과_수시_2026.pdf",
+      "/Users/code/projects/university/raw/univ_dist/상명대학교_서울/성적결과_정시_2026.pdf"
+    ],
+    "비고": "서울캠퍼스 성적결과(경쟁률 포함) PDF 다운로드(수시/정시)"
+  },
+  {
+    "대학명": "상명대학교[제2캠퍼스]",
+    "상태": "성공",
+    "다운로드": [
+      "/Users/code/projects/university/raw/univ_dist/상명대학교_천안/성적현황_수시_2026.pdf",
+      "/Users/code/projects/university/raw/univ_dist/상명대학교_천안/성적현황_정시_2026.pdf"
+    ],
+    "비고": "천안캠퍼스 성적현황(경쟁률 포함) PDF(수시/정시)"
+  },
+  {
+    "대학명": "상지대학교[본교]",
+    "상태": "성공",
+    "다운로드": [
+      "/Users/code/projects/university/raw/univ_dist/상지대학교/입시결과_수시_2026.pdf"
+    ],
+    "비고": "전년도 입시결과(수시) PDF 뷰어 원본 저장. 정시 페이지 URL 확인 실패로 수시만"
+  },
+  {
+    "대학명": "서울과학기술대학교[본교]",
+    "상태": "성공",
+    "다운로드": [
+      "/Users/code/projects/university/raw/univ_dist/서울과학기술대학교/입시결과_수시정시통합_2026.pdf"
+    ],
+    "비고": "입시결과 게시판(2026 수시·정시 통합본 PDF)"
+  }
+]

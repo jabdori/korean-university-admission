@@ -1,0 +1,247 @@
+[
+  {
+    "대학명": "가야대학교[본교]",
+    "상태": "성공",
+    "다운로드": [
+      "/Users/code/projects/university/raw/univ_dist/가야대학교_본교/입시결과_2026수시.jpg"
+    ],
+    "비고": "입시자료실 2026 수시 전형결과(70% CUT) 게시물 이미지 저장. 결과자료는 이미지로만 공개"
+  },
+  {
+    "대학명": "가천대학교[본교]",
+    "상태": "성공",
+    "다운로드": [
+      "/Users/code/projects/university/raw/univ_dist/가천대학교_본교/입시결과_2026수시.xlsx",
+      "/Users/code/projects/university/raw/univ_dist/가천대학교_본교/입시결과_2026정시.xlsx"
+    ],
+    "비고": "입시결과 게시판 2026 수시/정시 결과 엑셀"
+  },
+  {
+    "대학명": "가톨릭관동대학교[본교]",
+    "상태": "성공",
+    "다운로드": [
+      "/Users/code/projects/university/raw/univ_dist/가톨릭관동대학교_본교/입시결과_2026.pdf"
+    ],
+    "비고": "자료실 [공통] 2026학년도 입시결과(수시·정시) PDF"
+  },
+  {
+    "대학명": "가톨릭꽃동네대학교[본교]",
+    "상태": "성공",
+    "다운로드": [
+      "/Users/code/projects/university/raw/univ_dist/가톨릭꽃동네대학교_본교/입시결과_2026.pdf"
+    ],
+    "비고": "입시결과 게시판 2026학년도 신입생 모집 결과 PDF"
+  },
+  {
+    "대학명": "가톨릭대학교[본교]",
+    "상태": "성공",
+    "다운로드": [
+      "/Users/code/projects/university/raw/univ_dist/가톨릭대학교_본교/입시결과자료집_2026.pdf"
+    ],
+    "비고": "입시결과자료집 2026 PDF (9.8MB)"
+  },
+  {
+    "대학명": "가톨릭대학교[제3캠퍼스]",
+    "상태": "성공",
+    "다운로드": [
+      "/Users/code/projects/university/raw/univ_dist/가톨릭대학교_제3캠퍼스/입시결과자료집_2026.pdf"
+    ],
+    "비고": "캠퍼스 사이트엔 별도 결과 없음. 대학 공통 입시결과자료집(전 캠퍼스 포함) 저장"
+  },
+  {
+    "대학명": "감리교신학대학교[본교]",
+    "상태": "성공",
+    "다운로드": [
+      "/Users/code/projects/university/raw/univ_dist/감리교신학대학교_본교/경쟁률및등급_2023수시.jpg"
+    ],
+    "비고": "경쟁률 게시판 첨부 이미지(2023 수시 경쟁률+학생부 평균등급). 2024학년도 이후 경쟁률은 유웨이 데이터 팝업으로만 제공되어 파일 없음"
+  },
+  {
+    "대학명": "강남대학교[본교]",
+    "상태": "성공",
+    "다운로드": [
+      "/Users/code/projects/university/raw/univ_dist/강남대학교_본교/입시결과_2026.pdf"
+    ],
+    "비고": "입시결과 전용 웹페이지(vercel)를 PDF로 인쇄 저장. 파일 첨부 형태의 자료는 없음"
+  },
+  {
+    "대학명": "강서대학교[본교]",
+    "상태": "성공",
+    "다운로드": [
+      "/Users/code/projects/university/raw/univ_dist/강서대학교_본교/수시경쟁률_2026.xlsx",
+      "/Users/code/projects/university/raw/univ_dist/강서대학교_본교/수시경쟁률_2026.pdf"
+    ],
+    "비고": "역대경쟁률 게시판 2026 수시 경쟁률 xlsx+pdf"
+  },
+  {
+    "대학명": "강원대학교[본교]",
+    "상태": "성공",
+    "다운로드": [
+      "/Users/code/projects/university/raw/univ_dist/강원대학교_본교/입시결과_수시_2026.xlsx",
+      "/Users/code/projects/university/raw/univ_dist/강원대학교_본교/입시결과_정시_2026.xlsx",
+      "/Users/code/projects/university/raw/univ_dist/강원대학교_본교/학생부종합_산포도_2026.xlsx"
+    ],
+    "비고": "입시결과 게시판 2026 수시/정시 결과 xlsx + 학생부종합 산포도"
+  },
+  {
+    "대학명": "강원대학교[제2캠퍼스]",
+    "상태": "성공",
+    "다운로드": [
+      "/Users/code/projects/university/raw/univ_dist/강원대학교_제2캠퍼스/성적자료_수시_2026.pdf",
+      "/Users/code/projects/university/raw/univ_dist/강원대학교_제2캠퍼스/입시결과_수시_2026.xlsx",
+      "/Users/code/projects/university/raw/univ_dist/강원대학교_제2캠퍼스/입시결과_정시_2026.xlsx"
+    ],
+    "비고": "강릉원주캠퍼스 입시결과 게시판 자료 3건(성적자료 PDF 포함)"
+  },
+  {
+    "대학명": "건국대학교[본교]",
+    "상태": "성공",
+    "다운로드": [
+      "/Users/code/projects/university/raw/univ_dist/건국대학교_본교/입시결과_2026.pdf"
+    ],
+    "비고": "입학전형결과 게시판 2026 입시결과 통합 PDF (2.4MB). 경쟁률은 진학어플라이 팝업"
+  },
+  {
+    "대학명": "건국대학교(글로컬)[분교]",
+    "상태": "성공",
+    "다운로드": [
+      "/Users/code/projects/university/raw/univ_dist/건국대학교_글로컬/입시결과_수시_3개년비교.pdf",
+      "/Users/code/projects/university/raw/univ_dist/건국대학교_글로컬/입시결과_정시_3개년비교.pdf"
+    ],
+    "비고": "입학전형결과 게시판 2024~2026 3개년 수시/정시 입시결과 비교 PDF"
+  },
+  {
+    "대학명": "건양대학교[본교]",
+    "상태": "성공",
+    "다운로드": [
+      "/Users/code/projects/university/raw/univ_dist/건양대학교_본교/입시결과_2024.pdf",
+      "/Users/code/projects/university/raw/univ_dist/건양대학교_본교/입시결과_2023.pdf"
+    ],
+    "비고": "전년도 입시결과 게시판 최신 자료(2024·2023 PDF). 2025~2026 결과는 미게시"
+  },
+  {
+    "대학명": "건양대학교[제2캠퍼스]",
+    "상태": "성공",
+    "다운로드": [
+      "/Users/code/projects/university/raw/univ_dist/건양대학교_제2캠퍼스/입시결과_2024.pdf",
+      "/Users/code/projects/university/raw/univ_dist/건양대학교_제2캠퍼스/입시결과_2023.pdf"
+    ],
+    "비고": "본교와 동일 입학처 사이트. 동일 자료 복제"
+  },
+  {
+    "대학명": "경기대학교[본교]",
+    "상태": "성공",
+    "다운로드": [
+      "/Users/code/projects/university/raw/univ_dist/경기대학교_본교/입학통계_2026_2024.pdf"
+    ],
+    "비고": "전년도 입학통계(2026~2024) 통합 PDF 56p. 수시/정시 메뉴가 동일 파일 링크"
+  },
+  {
+    "대학명": "경기대학교[제2캠퍼스]",
+    "상태": "성공",
+    "다운로드": [
+      "/Users/code/projects/university/raw/univ_dist/경기대학교_제2캠퍼스/입학통계_2026_2024.pdf"
+    ],
+    "비고": "본교와 동일 입학처 사이트. 동일 자료 복제"
+  },
+  {
+    "대학명": "경남대학교[본교]",
+    "상태": "성공",
+    "다운로드": [
+      "/Users/code/projects/university/raw/univ_dist/경남대학교_본교/입시결과_수시_2026.pdf",
+      "/Users/code/projects/university/raw/univ_dist/경남대학교_본교/입시결과_정시_2026.pdf"
+    ],
+    "비고": "전년도 입시결과 게시판 2026 수시/정시 PDF"
+  },
+  {
+    "대학명": "경동대학교[본교]",
+    "상태": "성공",
+    "다운로드": [
+      "/Users/code/projects/university/raw/univ_dist/경동대학교_본교/입시결과_수시_2026.pdf"
+    ],
+    "비고": "입시결과 게시판 2026 수시 결과 PDF (캠퍼스 통합 자료)"
+  },
+  {
+    "대학명": "경동대학교[제3캠퍼스]",
+    "상태": "성공",
+    "다운로드": [
+      "/Users/code/projects/university/raw/univ_dist/경동대학교_제3캠퍼스/입시결과_수시_2026.pdf"
+    ],
+    "비고": "본교와 동일 입학처 사이트(캠퍼스 통합 자료). 복제"
+  },
+  {
+    "대학명": "경동대학교[제4캠퍼스]",
+    "상태": "성공",
+    "다운로드": [
+      "/Users/code/projects/university/raw/univ_dist/경동대학교_제4캠퍼스/입시결과_수시_2026.pdf"
+    ],
+    "비고": "본교와 동일 입학처 사이트(캠퍼스 통합 자료). 복제"
+  },
+  {
+    "대학명": "경북대학교[본교]",
+    "상태": "성공",
+    "다운로드": [
+      "/Users/code/projects/university/raw/univ_dist/경북대학교_본교/지원결과_2026.pdf",
+      "/Users/code/projects/university/raw/univ_dist/경북대학교_본교/지원결과_2026.xlsx"
+    ],
+    "비고": "공지사항 2026 수시·정시 지원결과 PDF+XLSX"
+  },
+  {
+    "대학명": "경상국립대학교[본교]",
+    "상태": "성공",
+    "다운로드": [
+      "/Users/code/projects/university/raw/univ_dist/경상국립대학교_본교/수시결과_2026.pdf",
+      "/Users/code/projects/university/raw/univ_dist/경상국립대학교_본교/정시결과_2026.pdf"
+    ],
+    "비고": "수시모집/정시모집 > 입학결과 > 2026학년도 PDF (경쟁률+성적)"
+  },
+  {
+    "대학명": "경성대학교[본교]",
+    "상태": "성공",
+    "다운로드": [
+      "/Users/code/projects/university/raw/univ_dist/경성대학교_본교/합격성적및충원현황_수시_2026.xlsx",
+      "/Users/code/projects/university/raw/univ_dist/경성대학교_본교/컷및충원현황_정시_2026.xlsx"
+    ],
+    "비고": "자료실 합격성적 카테고리 2026 수시/정시 XLSX"
+  },
+  {
+    "대학명": "경인교육대학교[본교]",
+    "상태": "성공",
+    "다운로드": [
+      "/Users/code/projects/university/raw/univ_dist/경인교육대학교_본교/입시결과_2026.hwp"
+    ],
+    "비고": "지난입시결과 게시판 2026 신입학 선발통계·입시결과 HWP"
+  },
+  {
+    "대학명": "경일대학교[본교]",
+    "상태": "성공",
+    "다운로드": [
+      "/Users/code/projects/university/raw/univ_dist/경일대학교_본교/전형결과_수시_2026.pdf",
+      "/Users/code/projects/university/raw/univ_dist/경일대학교_본교/전형결과_수시_2026.xlsx"
+    ],
+    "비고": "공지 게시판 2026 수시 학생부위주 주요 전형결과 PDF+XLSX"
+  },
+  {
+    "대학명": "경희대학교[본교]",
+    "상태": "성공",
+    "다운로드": [
+      "/Users/code/projects/university/raw/univ_dist/경희대학교_본교/입학전형통계자료_2026.pdf"
+    ],
+    "비고": "입시결과 게시판 2026학년도 입학전형 통계자료 PDF (9.7MB)"
+  },
+  {
+    "대학명": "계명대학교[본교]",
+    "상태": "성공",
+    "다운로드": [
+      "/Users/code/projects/university/raw/univ_dist/계명대학교_본교/성적현황_수시_2022.xlsx",
+      "/Users/code/projects/university/raw/univ_dist/계명대학교_본교/성적현황_정시_2022.xlsx"
+    ],
+    "비고": "입학결과 게시판 중 파일 첨부 최신 자료는 2022 성적현황. 2024~2025 경쟁률은 조회 서비스 링크로만 제공"
+  },
+  {
+    "대학명": "고려대학교[본교]",
+    "상태": "미발견",
+    "다운로드": [],
+    "비고": "입학처(oku) 내 입시결과/성적현황 파일 없음. 수시·정시·특별전형 지원율통계는 전부 유웨이(ratio.uwayapply.com) 조회 서비스 링크로만 제공, 입학자료실은 기출문제만 게시"
+  }
+]
