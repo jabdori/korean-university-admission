@@ -729,7 +729,32 @@ app.doc('/openapi', {
     { name: '전형', description: '전형 분류 목록과 레코드 상세 조회' },
   ],
 });
-app.get('/swagger', swaggerUI({ url: '/openapi' }));
+// Swagger UI는 응답 전체를 DOM으로 펼친다. 대량 records는 브라우저를 멈추게 하므로
+// 화면 표시만 미리보기로 자르고, 실제 API/MCP 응답은 전체를 유지한다.
+app.get('/swagger', swaggerUI({
+  url: '/openapi',
+  title: '대학 입시 정보 통합 API Swagger',
+  responseInterceptor: `(response) => {
+    if (!response?.url?.includes('/universities/info')) return response;
+    try {
+      const original = JSON.parse(response.text);
+      const limit = 20;
+      const records = original.records ?? [];
+      response.text = JSON.stringify({
+        ...original,
+        records: records.slice(0, limit),
+        swagger_preview: {
+          preview: true,
+          notice: 'Swagger UI 성능을 위해 records를 처음 20개만 표시합니다. API와 MCP는 전체를 반환합니다.',
+          original_record_count: records.length,
+          preview_record_count: Math.min(records.length, limit),
+          omitted_record_count: Math.max(records.length - limit, 0),
+        },
+      });
+    } catch {}
+    return response;
+  }`,
+}));
 app.get('/', c => c.redirect('/swagger'));
 
 app.notFound(c => c.json({ error: '요청한 경로를 찾을 수 없습니다.' }, 404));
