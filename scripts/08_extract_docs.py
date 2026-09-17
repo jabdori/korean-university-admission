@@ -13,8 +13,10 @@ import re
 import importlib.util
 import subprocess
 import tempfile
+import xml.etree.ElementTree as ET
 
 import pymupdf
+import xlrd
 from openpyxl import load_workbook
 
 PROJ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -56,6 +58,25 @@ def extract_pdf(path):
 
 
 def extract_xlsx(path):
+    # 확장자가 .xlsx여도 실제 구형 OLE2 Excel인 파일이 존재한다.
+    with open(path, "rb") as f:
+        if f.read(8) == b"\xd0\xcf\x11\xe0\xa1\xb1\x1a\xe1":
+            wb = xlrd.open_workbook(path)
+            sheets = []
+            for ws in wb.sheets():
+                rows = []
+                for r in range(ws.nrows):
+                    row = []
+                    for c in range(ws.ncols):
+                        cell = ws.cell(r, c)
+                        if cell.ctype == xlrd.XL_CELL_DATE:
+                            row.append(str(xlrd.xldate_as_datetime(cell.value, wb.datemode)))
+                        else:
+                            row.append("" if cell.value is None else str(cell.value))
+                    rows.append(row)
+                sheets.append({"sheet": ws.name, "rows": rows})
+            return {"kind": "xls", "sheets": sheets}
+
     wb = load_workbook(path, data_only=True, read_only=True)
     sheets = []
     for ws in wb.worksheets:
@@ -66,15 +87,45 @@ def extract_xlsx(path):
 
 
 def extract_hwpx(path):
-    """HWPX(=ZIP+HWPML XML) → 본문 텍스트. 표 셀 텍스트도 순서대로 포함."""
+    """HWPX(=ZIP+HWPML XML) → 본문 텍스트+표 그리드."""
     texts = []
+    tables = []
     with zipfile.ZipFile(path) as z:
         for name in z.namelist():
-            if name.endswith(".xml") and ("content" in name.lower() or "body" in name.lower()):
-                raw = z.read(name).decode("utf-8", "replace")
-                # HWPML 텍스트 추출 태그(T) 내용만 수집
-                texts += [m for m in re.findall(r"<h:t[^>]*>([^<]*)</h:t>", raw) if m.strip()]
-    return {"kind": "hwpx", "text": "\n".join(texts)}
+            if not re.fullmatch(r"Contents/section\d+\.xml", name):
+                continue
+            root = ET.fromstring(z.read(name))
+            parents = {child: parent for parent in root.iter() for child in parent}
+            local = lambda el: el.tag.rsplit("}", 1)[-1]
+            in_table = lambda el: any(local(p) == "tbl" for p in _ancestors(el, parents))
+            for el in root.iter():
+                if local(el) == "t" and el.text and el.text.strip() and not in_table(el):
+                    texts.append(el.text.strip())
+            for tbl in root.iter():
+                if local(tbl) != "tbl":
+                    continue
+                grid = []
+                for tr in tbl:
+                    if local(tr) != "tr":
+                        continue
+                    row = []
+                    for tc in tr:
+                        if local(tc) != "tc":
+                            continue
+                        cell = " ".join(t.text.strip() for t in tc.iter()
+                                        if local(t) == "t" and t.text and t.text.strip())
+                        row.append(cell)
+                    if any(row):
+                        grid.append(row)
+                if any(any(c.strip() for c in row) for row in grid):
+                    tables.append(grid)
+    return {"kind": "hwpx", "text": "\n".join(texts), "tables": tables}
+
+
+def _ancestors(el, parents):
+    while el in parents:
+        el = parents[el]
+        yield el
 
 
 def _table_parser():
@@ -128,6 +179,7 @@ def main():
             targets.append((p, ext))
 
     n_done = n_skip = 0
+    failures = []
     for p, ext in targets:
         out = rel_out(p)
         if os.path.exists(out):
@@ -162,6 +214,7 @@ def main():
             n_done += 1
         except Exception as e:
             print(f"추출 실패 {p}: {e}")
+            failures.append({"path": os.path.relpath(p, PROJ), "error": str(e)})
 
     # OCR 큐 병합(기존 항목 유지)
     old = []
@@ -171,7 +224,9 @@ def main():
     merged = old + [x for x in ocr_queue if x["path"] not in seen]
     os.makedirs(OUT, exist_ok=True)
     json.dump(merged, open(OCR_QUEUE, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
-    print(f"추출 완료 {n_done}, 스킵 {n_skip}, OCR/변환 대기 {len(merged)}")
+    json.dump(failures, open(os.path.join(OUT, "_failures.json"), "w", encoding="utf-8"),
+              ensure_ascii=False, indent=1)
+    print(f"추출 완료 {n_done}, 스킵 {n_skip}, OCR/변환 대기 {len(merged)}, 실패 {len(failures)}")
 
 
 if __name__ == "__main__":

@@ -52,6 +52,29 @@
 - 모집요강: 202/202 대학 × 시행계획/수시요강/정시요강 = 603건 (재외국민·외국인·선행학습영향평가 등 부수 파일은 용량 절제를 위해 제외, 필요시 05 스크립트 필터 제거 후 재실행)
 - 대학 자체 입시결과·분포 자료: 151/202 확보 (정적 크롤링 28 + 브라우저 탐색 123), 파일 총 300여 건
 
+## 원본 문서 구조 보존 추출 (2026-09-17 기준)
+
+- 유효 추출 789건: 디지털 PDF 660, 구형 HWP 78, XLSX 44, HWPX 6, 확장자 오기 구형 Excel(XLS) 1
+- 페이지 24,422개, 표 46,403개를 페이지/시트/표 단위로 보존
+- OCR 대기 90건(스캔 PDF 56 + 텍스트 없는 PDF 34)은 PP-StructureV3로 별도 추출 중
+- 서울신학대 전년도 입시결과 3959번 파일은 HWPX 확장자를 가진 404 HTML 문서라 데이터 없음
+
+문서 추출·OCR 환경은 uv로 분리한다. 시스템 Python 버전과 무관하게 Python 3.11 가상환경을 사용한다.
+
+    uv venv .venv-ocr --python 3.11
+    uv pip install --python .venv-ocr/bin/python \
+      "paddleocr==3.7.0" "paddlepaddle==3.3.1" "paddlex[ocr]==3.7.2" \
+      "pymupdf==1.28.2" "openpyxl==3.1.5" "pyhwp==0.1b15" "xlrd==2.0.2"
+
+    .venv-ocr/bin/python scripts/08_extract_docs.py
+    PADDLE_PDX_DISABLE_MODEL_SOURCE_CHECK=True \
+      .venv-ocr/bin/python scripts/09_ocr_extract.py 0 45
+    PADDLE_PDX_DISABLE_MODEL_SOURCE_CHECK=True \
+      .venv-ocr/bin/python scripts/09_ocr_extract.py 45 45
+    .venv-ocr/bin/python scripts/10_make_agent_tasks.py
+
+08번은 원본을 extracted/ 아래 동일 상대경로 + .json으로 저장하고 스캔 PDF는 extracted/_ocr_queue.json에 남긴다. 09번은 OCR 결과와 PaddleOCR 원 결과(.raw.json)를 함께 저장한다. 10번은 키워드 블록을 근거 위치(locator)와 함께 최대 12,000자 task로 나눠 normalized/agent_tasks.jsonl과 normalized/agent_prompt.md를 만든다. 현재 4,571개 task가 생성되었고, OCR 완료 후 재실행하면 대기 문서가 자동 포함된다.
+
 ## 미확보 51개 대학 요약 (raw/univ_dist 없음)
 
 - 포털 빈 조각 3개: 위 참조
