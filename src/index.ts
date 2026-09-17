@@ -16,120 +16,156 @@ const PayloadSchema = z.record(z.string(), z.unknown());
 const RequestSchema = z.object({
   universities: z.array(z.string().trim().min(1, '대학 이름은 비워 둘 수 없습니다.'))
     .min(1, '대학 이름을 1개 이상 입력해주세요.')
-    .max(10, '대학 이름은 최대 10개까지 조회할 수 있습니다.'),
-  record_type: RecordTypeSchema.optional(),
-  year: z.number().int().min(2018).max(2028).optional(),
-  round: RoundSchema.optional(),
-  selection_method: SelectionMethodSchema.optional(),
-  selection_target: SelectionTargetSchema.optional(),
-  quota_type: QuotaTypeSchema.optional(),
+    .max(10, '대학 이름은 최대 10개까지 조회할 수 있습니다.')
+    .describe('대학 표시 이름, 표준 이름, 등록된 별칭. 이름만 넣으면 나머지 조건 없이 해당 대학의 보유 데이터 전체를 조회한다.'),
+  record_type: RecordTypeSchema.optional().describe('레코드 종류. criteria=심사기준, result=입시결과, other=기타 안내. 생략하면 전체.'),
+  year: z.number().int().min(2018).max(2028).optional().describe('입시 연도(학년도). 생략하면 보유한 전체 연도.'),
+  round: RoundSchema.optional().describe('모집시기. 수시, 정시, 기타, 미상. 생략하면 전체.'),
+  selection_method: SelectionMethodSchema.optional().describe('주 전형요소 표준 분류. 생략하면 전체.'),
+  selection_target: SelectionTargetSchema.optional().describe('선발 대상 표준 분류. 생략하면 전체.'),
+  quota_type: QuotaTypeSchema.optional().describe('정원 구분. 정원내, 정원외. 생략하면 전체.'),
 }).strict();
 
 const ErrorResponseSchema = z.object({
-  error: z.string(),
-  details: z.array(z.object({ path: z.string(), message: z.string() })).optional(),
+  error: z.string().describe('사용자에게 표시할 한국어 오류 메시지.'),
+  details: z.array(z.object({
+    path: z.string().describe('검증에 실패한 요청 필드 경로.'),
+    message: z.string().describe('해당 필드의 한국어 오류 메시지.'),
+  })).optional().describe('요청 값 검증 실패 상세.'),
 });
 
 const UniversitySchema = z.object({
-  unv_cd: z.string(),
-  display_name: z.string(),
-  canonical_name: z.string(),
-  homepage: z.string().nullable(),
-  admission_homepage: z.string().nullable(),
-  extra_material_file_id: z.string().nullable(),
-  criteria_years: z.string().nullable(),
-  result_years: z.string().nullable(),
-  extra_material_count: z.number().int(),
-  has_admission_guide: z.boolean(),
-  university_site_material_count: z.number().int(),
+  unv_cd: z.string().describe('대학/캠퍼스 구분 단위의 고유 코드.'),
+  display_name: z.string().describe('캠퍼스까지 포함한 표시 이름. 예: 제주대학교[본교].'),
+  canonical_name: z.string().describe('캠퍼스 표기를 제거한 표준 대학 이름.'),
+  homepage: z.string().nullable().describe('대학 공식 홈페이지 주소.'),
+  admission_homepage: z.string().nullable().describe('대학 입학처/입시 홈페이지 주소.'),
+  extra_material_file_id: z.string().nullable().describe('수집 자료를 묶은 파일 식별자.'),
+  criteria_years: z.string().nullable().describe('보유한 심사기준 연도 목록.'),
+  result_years: z.string().nullable().describe('보유한 입시결과 연도 목록.'),
+  extra_material_count: z.number().int().describe('수집·보관 중인 입시 자료 파일 수.'),
+  has_admission_guide: z.boolean().describe('입시요강 자료 보유 여부.'),
+  university_site_material_count: z.number().int().describe('대학 사이트에서 직접 수집한 자료 수.'),
 });
 
 const AdmissionRecordSchema = z.object({
-  id: z.number().int(),
-  unv_cd: z.string(),
-  record_type: RecordTypeSchema,
-  admission_year: z.number().int().nullable(),
-  admission_round: z.string().nullable(),
-  selection_name: z.string().nullable(),
-  selection_method: SelectionMethodSchema,
-  selection_target: SelectionTargetSchema,
-  quota_type: QuotaTypeSchema.nullable(),
-  recruitment_unit: z.string().nullable(),
-  confidence: z.number().nullable(),
-  source: z.string(),
-  document_hint: z.string().nullable(),
-  model: z.string().nullable(),
-  payload: PayloadSchema,
+  id: z.number().int().describe('입시 레코드 고유 번호.'),
+  unv_cd: z.string().describe('대학/캠퍼스 고유 코드.'),
+  record_type: RecordTypeSchema.describe('레코드 종류. criteria=심사기준, result=입시결과, other=기타 안내.'),
+  admission_year: z.number().int().nullable().describe('입시 연도(학년도).'),
+  admission_round: z.string().nullable().describe('모집시기. 수시, 정시 등.'),
+  selection_name: z.string().nullable().describe('원문에 나온 하위 전형명.'),
+  selection_method: SelectionMethodSchema.describe('주 전형요소 표준 분류.'),
+  selection_target: SelectionTargetSchema.describe('선발 대상 표준 분류.'),
+  quota_type: QuotaTypeSchema.nullable().describe('정원 구분. 문서에 근거가 없으면 null.'),
+  recruitment_unit: z.string().nullable().describe('모집 단위/학과. 예: 소프트웨어학부, 전 모집단위.'),
+  confidence: z.number().nullable().describe('추출 신뢰도. 0~1.'),
+  source: z.string().describe('원본 문서 경로.'),
+  document_hint: z.string().nullable().describe('추출 작업에 사용한 문서 종류 힌트.'),
+  model: z.string().nullable().describe('정규화에 사용한 AI 모델 이름.'),
+  payload: PayloadSchema.describe('정규화된 원본 payload. 하위호환용이며, 최상위 상세 필드와 중복될 수 있다.'),
+});
+
+const StageElementSchema = z.object({
+  name: z.string().describe('전형 요소 이름. 예: 학생부교과, 면접평가.'),
+  weight_percent: z.number().nullable().describe('해당 요소의 반영 비율(%). 명시되지 않으면 null.'),
+});
+
+const StageSchema = z.object({
+  stage: z.string().describe('전형 단계 이름. 예: 일괄, 1단계, 2단계.'),
+  method: z.string().describe('단계의 대표 전형 방식.'),
+  multiple: z.number().nullable().describe('단계별 선발 인원 배수. 명시되지 않으면 null.'),
+  elements: z.array(StageElementSchema).describe('단계에서 반영하는 전형 요소와 비율.'),
+});
+
+const EvaluationSchema = z.object({
+  element: z.string().describe('평가 요소. 예: 인성, 수학능력시험.'),
+  criteria: z.string().describe('평가 기준/산출 방법 설명.'),
+  quote: z.string().describe('평가 기준을 근거하는 원문 인용.'),
+});
+
+const MetricSchema = z.object({
+  name: z.string().describe('수치 이름. 예: 모집인원, 경쟁률, 최초합격자 학생부 등급 평균.'),
+  value: z.string().describe('수치 값. 원문 단위를 보존하기 위해 문자열로 반환.'),
+  unit: z.string().describe('수치 단위. 예: 명, 점, 등급, :1. 없으면 빈 문자열.'),
+});
+
+const EvidenceSchema = z.object({
+  locator: z.string().describe('원본 문서 위치. 예: page 4.'),
+  quote: z.string().describe('정보 추출 근거가 되는 원문 인용.'),
 });
 
 // 정규화 payload 안의 전형 상세 필드를 최상위로 펼친 스키마.
 // 원본 payload도 하위호환을 위해 함께 반환한다.
 const DetailSchema = z.object({
-  eligibility: z.array(z.string()).optional(),
-  stages: z.array(z.record(z.string(), z.unknown())).optional(),
-  sat_minimum: z.record(z.string(), z.unknown()).nullable().optional(),
-  evaluation: z.array(z.record(z.string(), z.unknown())).optional(),
-  documents: z.array(z.record(z.string(), z.unknown())).optional(),
-  metrics: z.array(z.record(z.string(), z.unknown())).optional(),
-  evidence: z.array(z.record(z.string(), z.unknown())).optional(),
-  notes: z.array(z.string()).optional(),
+  eligibility: z.array(z.string()).optional().describe('지원자격 조건 문구.'),
+  stages: z.array(StageSchema).optional().describe('전형 단계, 방식, 요소별 반영 비율.'),
+  sat_minimum: z.object({
+    applies: z.boolean().nullable().describe('수능 최저 적용 여부. 판단할 수 없으면 null.'),
+    text: z.string().describe('수능 최저 기준 원문 설명.'),
+  }).nullable().optional().describe('수능 최저학력기준 정보.'),
+  evaluation: z.array(EvaluationSchema).optional().describe('평가 요소, 기준, 원문 근거.'),
+  documents: z.array(z.string()).optional().describe('제출 서류 문구.'),
+  metrics: z.array(MetricSchema).optional().describe('모집인원, 경쟁률, 합격자 성적 등 수치.'),
+  evidence: z.array(EvidenceSchema).optional().describe('원본 문서 위치와 인용 문구.'),
+  notes: z.array(z.string()).optional().describe('원문에서 추출한 참고 사항.'),
 });
 
 const DetailedRecordSchema = AdmissionRecordSchema.merge(DetailSchema);
 
 const ResponseSchema = z.object({
-  request: RequestSchema,
-  universities: z.array(UniversitySchema),
-  records: z.array(DetailedRecordSchema),
+  request: RequestSchema.describe('실제 적용된 조회 조건.'),
+  universities: z.array(UniversitySchema).describe('이름 조건과 매칭된 대학/캠퍼스 목록.'),
+  records: z.array(DetailedRecordSchema).describe('조건에 맞는 입시 레코드 전체. 대학 이름만 보내면 보유 데이터 전체.'),
   summaries: z.array(z.object({
-    unv_cd: z.string(),
-    display_name: z.string(),
-    total: z.number().int(),
-    criteria: z.number().int(),
-    result: z.number().int(),
-    other: z.number().int(),
-    years: z.record(z.string(), z.number().int()),
-    rounds: z.record(z.string(), z.number().int()),
-    selection_methods: z.record(z.string(), z.number().int()),
-    selection_targets: z.record(z.string(), z.number().int()),
-    quota_types: z.record(z.string(), z.number().int()),
-  })),
-  not_found: z.array(z.string()),
+    unv_cd: z.string().describe('대학/캠퍼스 고유 코드.'),
+    display_name: z.string().describe('대학/캠퍼스 표시 이름.'),
+    total: z.number().int().describe('조건에 맞는 전체 레코드 수.'),
+    criteria: z.number().int().describe('심사기준 레코드 수.'),
+    result: z.number().int().describe('입시결과 레코드 수.'),
+    other: z.number().int().describe('기타 안내 레코드 수.'),
+    years: z.record(z.string(), z.number().int()).describe('연도별 레코드 수.'),
+    rounds: z.record(z.string(), z.number().int()).describe('수시/정시 등 모집시기별 레코드 수.'),
+    selection_methods: z.record(z.string(), z.number().int()).describe('주 전형요소별 레코드 수.'),
+    selection_targets: z.record(z.string(), z.number().int()).describe('선발 대상별 레코드 수.'),
+    quota_types: z.record(z.string(), z.number().int()).describe('정원 구분별 레코드 수.'),
+  })).describe('대학별 조회 결과 요약. LLM이 하위 전형 분포를 파악하는 데 사용.'),
+  not_found: z.array(z.string()).describe('매칭되지 않은 입력 대학 이름.'),
 });
 
 const UniversitiesListResponseSchema = z.object({
-  universities: z.array(UniversitySchema),
-  total: z.number().int(),
-  page: z.number().int(),
-  page_size: z.number().int(),
+  universities: z.array(UniversitySchema).describe('검색 결과 대학 목록.'),
+  total: z.number().int().describe('검색 조건에 맞는 전체 대학 수.'),
+  page: z.number().int().describe('현재 페이지 번호.'),
+  page_size: z.number().int().describe('페이지당 반환 개수.'),
 });
 
 const RoundsResponseSchema = z.object({
-  university: UniversitySchema,
+  university: UniversitySchema.describe('조회한 대학/캠퍼스 정보.'),
   rounds: z.array(z.object({
-    admission_year: z.number().int().nullable(),
-    admission_round: z.string(),
-    record_count: z.number().int(),
-    selection_count: z.number().int(),
-  })),
+    admission_year: z.number().int().nullable().describe('입시 연도(학년도).'),
+    admission_round: z.string().describe('모집시기. 수시, 정시 등.'),
+    record_count: z.number().int().describe('해당 연도·모집시기 레코드 수.'),
+    selection_count: z.number().int().describe('서로 다른 하위 전형 수.'),
+  })).describe('연도×모집시기별 보유 자료 요약.'),
 });
 
 const SelectionsResponseSchema = z.object({
-  university: UniversitySchema,
+  university: UniversitySchema.describe('조회한 대학/캠퍼스 정보.'),
   selections: z.array(z.object({
-    selection_name: z.string(),
-    admission_year: z.number().int().nullable(),
-    admission_round: z.string(),
-    selection_method: SelectionMethodSchema,
-    selection_target: SelectionTargetSchema,
-    quota_type: QuotaTypeSchema.nullable(),
-    record_count: z.number().int(),
-    sample_record_id: z.number().int(),
-  })),
+    selection_name: z.string().describe('원문에 나온 하위 전형명.'),
+    admission_year: z.number().int().nullable().describe('입시 연도(학년도).'),
+    admission_round: z.string().describe('모집시기.'),
+    selection_method: SelectionMethodSchema.describe('주 전형요소 표준 분류.'),
+    selection_target: SelectionTargetSchema.describe('선발 대상 표준 분류.'),
+    quota_type: QuotaTypeSchema.nullable().describe('정원 구분. 근거가 없으면 null.'),
+    record_count: z.number().int().describe('같은 전형 조합에 속하는 레코드 수.'),
+    sample_record_id: z.number().int().describe('상세 조회용 대표 레코드 ID.'),
+  })).describe('하위 전형 목록과 표준 분류.'),
 });
 
 const RecordResponseSchema = z.object({
-  record: DetailedRecordSchema,
+  record: DetailedRecordSchema.describe('입시 레코드 상세 정보.'),
 });
 
 const app = new OpenAPIHono<{ Bindings: Env }>({
@@ -154,7 +190,14 @@ const healthRoute = createRoute({
   description: 'Worker와 D1 데이터베이스가 정상적으로 응답하는지 확인합니다.',
   tags: ['시스템'],
   responses: {
-    200: { description: '정상', content: { 'application/json': { schema: z.object({ ok: z.boolean() }) } } },
+    200: {
+      description: '정상',
+      content: {
+        'application/json': {
+          schema: z.object({ ok: z.boolean().describe('API와 D1 조회가 정상이면 true.') }),
+        },
+      },
+    },
     500: { description: '데이터베이스 오류', content: { 'application/json': { schema: ErrorResponseSchema } } },
   },
 });
@@ -178,9 +221,9 @@ const universitiesListRoute = createRoute({
   tags: ['대학'],
   request: {
     query: z.object({
-      q: z.string().trim().min(1, '검색어는 비워 둘 수 없습니다.').optional(),
-      page: z.coerce.number().int().min(1, '페이지는 1 이상이어야 합니다.').default(1),
-      page_size: z.coerce.number().int().min(1, '페이지 크기는 1 이상이어야 합니다.').max(100, '페이지 크기는 최대 100까지 가능합니다.').default(20),
+      q: z.string().trim().min(1, '검색어는 비워 둘 수 없습니다.').optional().describe('표시 이름, 표준 이름, 등록 별칭에 부분 일치하는 검색어.'),
+      page: z.coerce.number().int().min(1, '페이지는 1 이상이어야 합니다.').default(1).describe('페이지 번호.'),
+      page_size: z.coerce.number().int().min(1, '페이지 크기는 1 이상이어야 합니다.').max(100, '페이지 크기는 최대 100까지 가능합니다.').default(20).describe('페이지당 대학 개수.'),
     }),
   },
   responses: {
@@ -228,9 +271,9 @@ const universityRoundsRoute = createRoute({
   description: '연도×수시/정시 조합별 레코드 수와 전형 수를 조회합니다.',
   tags: ['모집시기'],
   request: {
-    params: z.object({ unvCd: z.string().trim().min(1, '대학 코드는 비워 둘 수 없습니다.') }),
+    params: z.object({ unvCd: z.string().trim().min(1, '대학 코드는 비워 둘 수 없습니다.').describe('대학/캠퍼스 고유 코드.') }),
     query: z.object({
-      year: z.coerce.number().int().min(2018).max(2028).optional(),
+      year: z.coerce.number().int().min(2018).max(2028).optional().describe('입시 연도(학년도). 생략하면 전체.'),
     }),
   },
   responses: {
@@ -292,13 +335,13 @@ const universitySelectionsRoute = createRoute({
   description: '전형명×연도×모집시기×표준 분류 조합별 레코드 수와 대표 레코드 ID를 조회합니다. 주 전형요소, 선발 대상, 정원 구분으로 좁힐 수 있습니다.',
   tags: ['전형'],
   request: {
-    params: z.object({ unvCd: z.string().trim().min(1, '대학 코드는 비워 둘 수 없습니다.') }),
+    params: z.object({ unvCd: z.string().trim().min(1, '대학 코드는 비워 둘 수 없습니다.').describe('대학/캠퍼스 고유 코드.') }),
     query: z.object({
-      year: z.coerce.number().int().min(2018).max(2028).optional(),
-      round: RoundSchema.optional(),
-      selection_method: SelectionMethodSchema.optional(),
-      selection_target: SelectionTargetSchema.optional(),
-      quota_type: QuotaTypeSchema.optional(),
+      year: z.coerce.number().int().min(2018).max(2028).optional().describe('입시 연도(학년도). 생략하면 전체.'),
+      round: RoundSchema.optional().describe('모집시기. 수시, 정시, 기타, 미상.'),
+      selection_method: SelectionMethodSchema.optional().describe('주 전형요소 표준 분류.'),
+      selection_target: SelectionTargetSchema.optional().describe('선발 대상 표준 분류.'),
+      quota_type: QuotaTypeSchema.optional().describe('정원 구분. 정원내, 정원외.'),
     }),
   },
   responses: {
@@ -378,7 +421,7 @@ const recordDetailRoute = createRoute({
   description: '단일 레코드의 표준 분류, 원본 payload, 지원자격, 전형 단계, 수능 최저, 평가 기준, 근거 문구를 함께 반환합니다.',
   tags: ['전형'],
   request: {
-    params: z.object({ id: z.coerce.number().int().min(1, '레코드 ID는 1 이상이어야 합니다.') }),
+    params: z.object({ id: z.coerce.number().int().min(1, '레코드 ID는 1 이상이어야 합니다.').describe('입시 레코드 고유 번호.') }),
   },
   responses: {
     200: { description: '입시 레코드 상세', content: { 'application/json': { schema: RecordResponseSchema } } },
@@ -552,7 +595,7 @@ function registerAdmissionTools(server: McpServer, db: D1Database) {
 }
 
 async function handleMcp(raw: Request, parsedBody: unknown, db: D1Database) {
-  const server = new McpServer({ name: 'university-admission-api', version: '1.2.0' });
+  const server = new McpServer({ name: 'university-admission-api', version: '1.3.0' });
   registerAdmissionTools(server, db);
   const transport = new WebStandardStreamableHTTPServerTransport({ sessionIdGenerator: undefined });
   await server.connect(transport);
@@ -690,7 +733,7 @@ app.doc('/openapi', {
   openapi: '3.0.0',
   info: {
     title: '대학 입시 정보 통합 API',
-    version: '1.2.0',
+    version: '1.3.0',
     description: '대학 이름으로 심사기준·입시결과 등 수집·정규화된 정보를 조회합니다.\n\nMCP 클라이언트는 같은 Worker의 /mcp 엔드포인트에 Streamable HTTP로 연결할 수 있습니다. 대학·모집시기·전형 분류 조건을 한 번에 넘기면 get_university_info 도구가 하위 전형·모집단위·전형 단계·평가 기준·근거를 통째로 반환합니다. search_universities, list_university_selections, get_admission_record는 보조 조회용입니다.',
   },
   servers: [{ url: 'https://university-admission-api.aside-hazle6287.workers.dev' }],
