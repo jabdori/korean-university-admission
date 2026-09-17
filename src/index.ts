@@ -120,6 +120,9 @@ const SelectionsResponseSchema = z.object({
     selection_name: z.string(),
     admission_year: z.number().int().nullable(),
     admission_round: z.string(),
+    selection_method: SelectionMethodSchema,
+    selection_target: SelectionTargetSchema,
+    quota_type: QuotaTypeSchema.nullable(),
     record_count: z.number().int(),
     sample_record_id: z.number().int(),
   })),
@@ -462,6 +465,28 @@ function toolJson(value: unknown) {
 }
 
 function registerAdmissionTools(server: McpServer, db: D1Database) {
+  // 통합 조회 도구: 여러 대학/하위 전형을 일일이 조회하지 않고 한 번에 받는다.
+  server.registerTool('get_university_info', {
+    title: '대학 입시 정보 통합 조회',
+    description: '대학 이름 목록과 연도·모집시기·전형 분류 조건으로 일치하는 모든 하위 전형 레코드를 한 번에 반환합니다. 여러 전형을 하나씩 조회할 필요 없이 이 도구를 먼저 사용하세요.',
+    inputSchema: RequestSchema.shape,
+  }, async input => {
+    const response = await app.request('/universities/info', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(input),
+    }, { DB: db });
+    const value = await response.json() as {
+      records?: Array<{ payload?: unknown } & Record<string, unknown>>;
+    } & Record<string, unknown>;
+
+    // 상세 필드는 최상위에 이미 펼쳐 두므로 원본 payload 중복은 LLM 컨텍스트에서 제외한다.
+    if (Array.isArray(value.records)) {
+      value.records = value.records.map(({ payload: _payload, ...record }) => record);
+    }
+    return toolJson(value);
+  });
+
   server.registerTool('search_universities', {
     title: '대학 검색',
     description: '이름이나 코드로 대학을 검색하고 캠퍼스 코드, 표준 이름, 입시 자료 보유 현황을 반환합니다.',
@@ -527,7 +552,7 @@ function registerAdmissionTools(server: McpServer, db: D1Database) {
 }
 
 async function handleMcp(raw: Request, parsedBody: unknown, db: D1Database) {
-  const server = new McpServer({ name: 'university-admission-api', version: '1.1.0' });
+  const server = new McpServer({ name: 'university-admission-api', version: '1.2.0' });
   registerAdmissionTools(server, db);
   const transport = new WebStandardStreamableHTTPServerTransport({ sessionIdGenerator: undefined });
   await server.connect(transport);
@@ -536,8 +561,9 @@ async function handleMcp(raw: Request, parsedBody: unknown, db: D1Database) {
 
 const allowedMcpHosts = ['localhost', '127.0.0.1', '[::1]', 'university-admission-api.aside-hazle6287.workers.dev'];
 const mcpApp = createMcpHonoApp({ allowedHosts: allowedMcpHosts, allowedOrigins: allowedMcpHosts });
-mcpApp.all('/mcp', c => handleMcp(c.req.raw, undefined, (c.env as Env).DB));
-app.route('/', mcpApp);
+// Host/Origin 검증과 요청 본문 파싱은 /mcp에만 적용한다.
+mcpApp.all('/', c => handleMcp(c.req.raw, undefined, (c.env as Env).DB));
+app.route('/mcp', mcpApp);
 
 app.openapi(universityInfoRoute, async c => {
   const body = c.req.valid('json');
@@ -664,8 +690,8 @@ app.doc('/openapi', {
   openapi: '3.0.0',
   info: {
     title: '대학 입시 정보 통합 API',
-    version: '1.1.0',
-    description: '대학 이름으로 심사기준·입시결과 등 수집·정규화된 정보를 조회합니다.\n\nMCP 클라이언트는 같은 Worker의 /mcp 엔드포인트에 Streamable HTTP로 연결하고 search_universities, list_university_selections, get_admission_record 도구를 사용할 수 있습니다.',
+    version: '1.2.0',
+    description: '대학 이름으로 심사기준·입시결과 등 수집·정규화된 정보를 조회합니다.\n\nMCP 클라이언트는 같은 Worker의 /mcp 엔드포인트에 Streamable HTTP로 연결할 수 있습니다. 대학·모집시기·전형 분류 조건을 한 번에 넘기면 get_university_info 도구가 하위 전형·모집단위·전형 단계·평가 기준·근거를 통째로 반환합니다. search_universities, list_university_selections, get_admission_record는 보조 조회용입니다.',
   },
   servers: [{ url: 'https://university-admission-api.aside-hazle6287.workers.dev' }],
   tags: [

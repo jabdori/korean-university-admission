@@ -97,7 +97,7 @@ Cloudflare Worker + D1 + Hono로 배포한다. 정규화된 대학 마스터, �
 - 모집시기 요약: GET /universities/{unvCd}/rounds
 - 전형 목록: GET /universities/{unvCd}/selections
 - 레코드 상세: GET /records/{id}
-- MCP Streamable HTTP: POST /mcp (도구: search_universities, list_university_selections, get_admission_record)
+- MCP Streamable HTTP: POST /mcp (기본 도구: get_university_info, 보조 도구: search_universities, list_university_selections, get_admission_record)
 
 전형 표준 분류는 admission_records에 3개 컬럼으로 저장한다.
 
@@ -113,7 +113,7 @@ Cloudflare Worker + D1 + Hono로 배포한다. 정규화된 대학 마스터, �
 
 요청 정보, 매칭된 대학 목록, 원본 근거 경로가 포함된 records, 대학별 요약(summaries), 찾지 못한 이름(not_found)으로 구성된다. 대학 이름은 최대 10개까지 요청할 수 있다. record_type, year, round 외에 selection_method, selection_target, quota_type로도 필터할 수 있다.
 
-MCP 클라이언트는 같은 배포 주소의 /mcp를 Streamable HTTP 서버로 등록하면 된다. 인증은 걸려 있지 않으며, 요청/응답은 표준 MCP JSON-RPC 2.0을 따른다.
+MCP 클라이언트는 같은 배포 주소의 /mcp를 Streamable HTTP 서버로 등록하면 된다. 인증은 걸려 있지 않으며, 요청/응답은 표준 MCP JSON-RPC 2.0을 따른다. LLM은 get_university_info에 대학 이름과 year, round, selection_method 등 조건을 넘겨서 하위 전형·모집단위·전형 단계·평가 기준·근거를 한 번에 받아 판단하고, 개별 코드/레코드 확인이 필요할 때만 보조 도구를 사용한다.
 
 API 개발과 배포:
 
