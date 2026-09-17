@@ -93,12 +93,27 @@ Cloudflare Worker + D1 + Hono로 배포한다. 정규화된 대학 마스터, �
 - OpenAPI 문서: GET /openapi
 - Swagger UI: GET /swagger
 - 통합 조회: POST /universities/info
+- 대학 목록: GET /universities
+- 모집시기 요약: GET /universities/{unvCd}/rounds
+- 전형 목록: GET /universities/{unvCd}/selections
+- 레코드 상세: GET /records/{id}
+- MCP Streamable HTTP: POST /mcp (도구: search_universities, list_university_selections, get_admission_record)
+
+전형 표준 분류는 admission_records에 3개 컬럼으로 저장한다.
+
+- 주 전형요소(selection_method): 학생부교과, 학생부종합, 논술, 실기, 수능, 기타
+- 선발 대상(selection_target): 일반, 지역인재, 농어촌, 기회균형, 특성화고, 특수교육, 특기자, 재직성인, 기타
+- 정원 구분(quota_type): 정원내, 정원외 (문서에 근거가 없으면 NULL)
+
+분류 규칙은 scripts/classify_selection.py 하나에서 관리하며, 전형명과 정규화된 전형 단계(method/elements)를 함께 근거로 사용한다. 혼합형은 실기 > 논술 > 수능 > 학생부교과 > 학생부종합 순서로 주 요소를 정하고, 선발 대상은 특수교육 > 특성화고 > 농어촌 > 기회균형 > 특기자 > 재직성인 > 지역인재 순서를 우선한다. "모집인원 현황", "전형료 안내" 같은 노이즈는 기타로 처리한다.
 
 요청 예시는 다음과 같다. record_type, year, round는 선택 필터다.
 
     curl -sS -X POST https://university-admission-api.aside-hazle6287.workers.dev/universities/info -H 'Content-Type: application/json' -d '{"universities":["제주대학교","한림대학교"],"record_type":"criteria","year":2027,"round":"수시"}'
 
-응답은 요청 정보, 매칭된 대학 목록, 원본 근거 경로가 포함된 records, 대학별 요약(summaries), 찾지 못한 이름(not_found)으로 구성된다. 대학 이름은 최대 10개까지 요청할 수 있다.
+요청 정보, 매칭된 대학 목록, 원본 근거 경로가 포함된 records, 대학별 요약(summaries), 찾지 못한 이름(not_found)으로 구성된다. 대학 이름은 최대 10개까지 요청할 수 있다. record_type, year, round 외에 selection_method, selection_target, quota_type로도 필터할 수 있다.
+
+MCP 클라이언트는 같은 배포 주소의 /mcp를 Streamable HTTP 서버로 등록하면 된다. 인증은 걸려 있지 않으며, 요청/응답은 표준 MCP JSON-RPC 2.0을 따른다.
 
 API 개발과 배포:
 

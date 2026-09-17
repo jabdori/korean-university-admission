@@ -1,11 +1,16 @@
 import { OpenAPIHono, createRoute } from '@hono/zod-openapi';
 import { swaggerUI } from '@hono/swagger-ui';
 import { z } from 'zod';
+import { McpServer, WebStandardStreamableHTTPServerTransport } from '@modelcontextprotocol/server';
+import { createMcpHonoApp } from '@modelcontextprotocol/hono';
 
 type Env = { DB: D1Database };
 
 const RecordTypeSchema = z.enum(['criteria', 'result', 'other']);
 const RoundSchema = z.enum(['수시', '정시', '기타', '미상']);
+const SelectionMethodSchema = z.enum(['학생부교과', '학생부종합', '논술', '실기', '수능', '기타']);
+const SelectionTargetSchema = z.enum(['일반', '지역인재', '농어촌', '기회균형', '특성화고', '특수교육', '특기자', '재직성인', '기타']);
+const QuotaTypeSchema = z.enum(['정원내', '정원외']);
 const PayloadSchema = z.record(z.string(), z.unknown());
 
 const RequestSchema = z.object({
@@ -15,6 +20,9 @@ const RequestSchema = z.object({
   record_type: RecordTypeSchema.optional(),
   year: z.number().int().min(2018).max(2028).optional(),
   round: RoundSchema.optional(),
+  selection_method: SelectionMethodSchema.optional(),
+  selection_target: SelectionTargetSchema.optional(),
+  quota_type: QuotaTypeSchema.optional(),
 }).strict();
 
 const ErrorResponseSchema = z.object({
@@ -43,6 +51,9 @@ const AdmissionRecordSchema = z.object({
   admission_year: z.number().int().nullable(),
   admission_round: z.string().nullable(),
   selection_name: z.string().nullable(),
+  selection_method: SelectionMethodSchema,
+  selection_target: SelectionTargetSchema,
+  quota_type: QuotaTypeSchema.nullable(),
   recruitment_unit: z.string().nullable(),
   confidence: z.number().nullable(),
   source: z.string(),
@@ -79,6 +90,9 @@ const ResponseSchema = z.object({
     other: z.number().int(),
     years: z.record(z.string(), z.number().int()),
     rounds: z.record(z.string(), z.number().int()),
+    selection_methods: z.record(z.string(), z.number().int()),
+    selection_targets: z.record(z.string(), z.number().int()),
+    quota_types: z.record(z.string(), z.number().int()),
   })),
   not_found: z.array(z.string()),
 });
@@ -133,6 +147,9 @@ const app = new OpenAPIHono<{ Bindings: Env }>({
 const healthRoute = createRoute({
   method: 'get',
   path: '/health',
+  summary: 'API 상태 확인',
+  description: 'Worker와 D1 데이터베이스가 정상적으로 응답하는지 확인합니다.',
+  tags: ['시스템'],
   responses: {
     200: { description: '정상', content: { 'application/json': { schema: z.object({ ok: z.boolean() }) } } },
     500: { description: '데이터베이스 오류', content: { 'application/json': { schema: ErrorResponseSchema } } },
@@ -153,6 +170,9 @@ app.openapi(healthRoute, async c => {
 const universitiesListRoute = createRoute({
   method: 'get',
   path: '/universities',
+  summary: '대학 목록 조회',
+  description: '대학 코드, 표시 이름, 캠퍼스별 별칭 대상, 입시 자료 보유 현황을 페이지로 조회합니다. 검색어는 표시 이름·표준 이름·별칭에 부분 일치로 적용됩니다.',
+  tags: ['대학'],
   request: {
     query: z.object({
       q: z.string().trim().min(1, '검색어는 비워 둘 수 없습니다.').optional(),
@@ -201,6 +221,9 @@ app.openapi(universitiesListRoute, async c => {
 const universityRoundsRoute = createRoute({
   method: 'get',
   path: '/universities/{unvCd}/rounds',
+  summary: '대학별 모집시기 요약 조회',
+  description: '연도×수시/정시 조합별 레코드 수와 전형 수를 조회합니다.',
+  tags: ['모집시기'],
   request: {
     params: z.object({ unvCd: z.string().trim().min(1, '대학 코드는 비워 둘 수 없습니다.') }),
     query: z.object({
@@ -220,6 +243,12 @@ type RoundRow = {
   admission_round: string;
   record_count: number;
   selection_count: number;
+};
+
+type SelectionClassRow = {
+  selection_method: z.infer<typeof SelectionMethodSchema>;
+  selection_target: z.infer<typeof SelectionTargetSchema>;
+  quota_type: z.infer<typeof QuotaTypeSchema> | null;
 };
 
 app.openapi(universityRoundsRoute, async c => {
@@ -256,11 +285,17 @@ app.openapi(universityRoundsRoute, async c => {
 const universitySelectionsRoute = createRoute({
   method: 'get',
   path: '/universities/{unvCd}/selections',
+  summary: '대학별 전형 목록 조회',
+  description: '전형명×연도×모집시기×표준 분류 조합별 레코드 수와 대표 레코드 ID를 조회합니다. 주 전형요소, 선발 대상, 정원 구분으로 좁힐 수 있습니다.',
+  tags: ['전형'],
   request: {
     params: z.object({ unvCd: z.string().trim().min(1, '대학 코드는 비워 둘 수 없습니다.') }),
     query: z.object({
       year: z.coerce.number().int().min(2018).max(2028).optional(),
       round: RoundSchema.optional(),
+      selection_method: SelectionMethodSchema.optional(),
+      selection_target: SelectionTargetSchema.optional(),
+      quota_type: QuotaTypeSchema.optional(),
     }),
   },
   responses: {
@@ -275,13 +310,16 @@ type SelectionRow = {
   selection_name: string;
   admission_year: number | null;
   admission_round: string;
+  selection_method: SelectionClassRow['selection_method'];
+  selection_target: SelectionClassRow['selection_target'];
+  quota_type: SelectionClassRow['quota_type'];
   record_count: number;
   sample_record_id: number;
 };
 
 app.openapi(universitySelectionsRoute, async c => {
   const { unvCd } = c.req.valid('param');
-  const { year, round } = c.req.valid('query');
+  const { year, round, selection_method, selection_target, quota_type } = c.req.valid('query');
   try {
     const university = await c.env.DB.prepare(
       'SELECT * FROM universities WHERE unv_cd = ?',
@@ -298,12 +336,25 @@ app.openapi(universitySelectionsRoute, async c => {
       where.push('admission_round = ?');
       params.push(round);
     }
+    if (selection_method) {
+      where.push('selection_method = ?');
+      params.push(selection_method);
+    }
+    if (selection_target) {
+      where.push('selection_target = ?');
+      params.push(selection_target);
+    }
+    if (quota_type) {
+      where.push('quota_type = ?');
+      params.push(quota_type);
+    }
     const result = await c.env.DB.prepare(
-      `SELECT selection_name, admission_year, admission_round, COUNT(*) as record_count, MIN(id) as sample_record_id
+      `SELECT selection_name, admission_year, admission_round, selection_method, selection_target, quota_type,
+              COUNT(*) as record_count, MIN(id) as sample_record_id
        FROM admission_records
        WHERE ${where.join(' AND ')}
-       GROUP BY selection_name, admission_year, admission_round
-       ORDER BY admission_year DESC, admission_round, selection_name`,
+       GROUP BY selection_name, admission_year, admission_round, selection_method, selection_target, quota_type
+       ORDER BY admission_year DESC, admission_round, selection_method, selection_target, quota_type, selection_name`,
     ).bind(...params).all<SelectionRow>();
 
     const { has_admission_guide, ...u } = university;
@@ -320,6 +371,9 @@ app.openapi(universitySelectionsRoute, async c => {
 const recordDetailRoute = createRoute({
   method: 'get',
   path: '/records/{id}',
+  summary: '입시 레코드 상세 조회',
+  description: '단일 레코드의 표준 분류, 원본 payload, 지원자격, 전형 단계, 수능 최저, 평가 기준, 근거 문구를 함께 반환합니다.',
+  tags: ['전형'],
   request: {
     params: z.object({ id: z.coerce.number().int().min(1, '레코드 ID는 1 이상이어야 합니다.') }),
   },
@@ -349,6 +403,9 @@ app.openapi(recordDetailRoute, async c => {
 const universityInfoRoute = createRoute({
   method: 'post',
   path: '/universities/info',
+  summary: '대학 입시 정보 통합 조회',
+  description: '대학 이름을 최대 10개까지 받아 심사기준·입시결과 레코드와 대학 요약을 반환합니다. 레코드 종류, 연도, 모집시기, 표준 전형 분류로 필터할 수 있습니다.',
+  tags: ['대학'],
   request: { body: { required: true, content: { 'application/json': { schema: RequestSchema } } } },
   responses: {
     200: { description: '대학별 입시 정보', content: { 'application/json': { schema: ResponseSchema } } },
@@ -378,6 +435,9 @@ type AdmissionRecordRow = {
   admission_year: number | null;
   admission_round: string | null;
   selection_name: string | null;
+  selection_method: SelectionClassRow['selection_method'];
+  selection_target: SelectionClassRow['selection_target'];
+  quota_type: SelectionClassRow['quota_type'];
   recruitment_unit: string | null;
   confidence: number | null;
   source: string;
@@ -395,6 +455,89 @@ function pickDetail(payload: Record<string, unknown>) {
   }
   return detail;
 }
+
+// MCP 도구는 HTTP API와 같은 D1 조회를 사용한다. 응답은 MCP 텍스트 콘텐츠로 감싼다.
+function toolJson(value: unknown) {
+  return { content: [{ type: 'text' as const, text: JSON.stringify(value, null, 2) }] };
+}
+
+function registerAdmissionTools(server: McpServer, db: D1Database) {
+  server.registerTool('search_universities', {
+    title: '대학 검색',
+    description: '이름이나 코드로 대학을 검색하고 캠퍼스 코드, 표준 이름, 입시 자료 보유 현황을 반환합니다.',
+    inputSchema: {
+      q: z.string().trim().min(1).optional(),
+      page: z.number().int().min(1).default(1),
+      page_size: z.number().int().min(1).max(100).default(20),
+    },
+  }, async ({ q, page, page_size }) => {
+    const escaped = q?.replace(/[\\%_]/g, m => '\\' + m);
+    const like = escaped ? `%${escaped}%` : null;
+    const where = like
+      ? `WHERE u.display_name LIKE ? ESCAPE '\\' OR u.canonical_name LIKE ? ESCAPE '\\' OR EXISTS (SELECT 1 FROM university_aliases a WHERE a.unv_cd = u.unv_cd AND a.alias LIKE ? ESCAPE '\\')`
+      : '';
+    const params = like ? [like, like, like] : [];
+    const count = await db.prepare(`SELECT COUNT(*) as total FROM universities u ${where}`).bind(...params).first<{ total: number }>();
+    const result = await db.prepare(
+      `SELECT u.* FROM universities u ${where} ORDER BY u.display_name LIMIT ? OFFSET ?`,
+    ).bind(...params, page_size, (page - 1) * page_size).all<UniversityRow>();
+    return toolJson({ total: count?.total ?? 0, page, page_size, universities: result.results ?? [] });
+  });
+
+  server.registerTool('list_university_selections', {
+    title: '대학 전형 목록',
+    description: '대학 코드로 전형 목록을 조회합니다. 연도, 모집시기, 주 전형요소, 선발 대상, 정원 구분으로 필터할 수 있습니다.',
+    inputSchema: {
+      unv_cd: z.string().trim().min(1),
+      year: z.number().int().min(2018).max(2028).optional(),
+      round: RoundSchema.optional(),
+      selection_method: SelectionMethodSchema.optional(),
+      selection_target: SelectionTargetSchema.optional(),
+      quota_type: QuotaTypeSchema.optional(),
+    },
+  }, async input => {
+    const where = ['unv_cd = ?', 'selection_name IS NOT NULL'];
+    const params: (string | number)[] = [input.unv_cd];
+    if (input.year !== undefined) { where.push('admission_year = ?'); params.push(input.year); }
+    if (input.round) { where.push('admission_round = ?'); params.push(input.round); }
+    if (input.selection_method) { where.push('selection_method = ?'); params.push(input.selection_method); }
+    if (input.selection_target) { where.push('selection_target = ?'); params.push(input.selection_target); }
+    if (input.quota_type) { where.push('quota_type = ?'); params.push(input.quota_type); }
+    const result = await db.prepare(
+      `SELECT selection_name, admission_year, admission_round, selection_method, selection_target, quota_type,
+              COUNT(*) as record_count, MIN(id) as sample_record_id
+       FROM admission_records
+       WHERE ${where.join(' AND ')}
+       GROUP BY selection_name, admission_year, admission_round, selection_method, selection_target, quota_type
+       ORDER BY admission_year DESC, admission_round, selection_method, selection_target, quota_type, selection_name`,
+    ).bind(...params).all<SelectionRow>();
+    return toolJson({ selections: result.results ?? [] });
+  });
+
+  server.registerTool('get_admission_record', {
+    title: '입시 레코드 상세',
+    description: '레코드 ID로 지원자격, 전형 단계, 수능 최저, 평가 기준, 문서 근거까지 반환합니다.',
+    inputSchema: { id: z.number().int().min(1) },
+  }, async ({ id }) => {
+    const row = await db.prepare('SELECT * FROM admission_records WHERE id = ?').bind(id).first<AdmissionRecordRow>();
+    if (!row) return toolJson({ error: '레코드를 찾을 수 없습니다.' });
+    const payload = JSON.parse(row.payload) as Record<string, unknown>;
+    return toolJson({ record: { ...row, payload, ...pickDetail(payload) } });
+  });
+}
+
+async function handleMcp(raw: Request, parsedBody: unknown, db: D1Database) {
+  const server = new McpServer({ name: 'university-admission-api', version: '1.1.0' });
+  registerAdmissionTools(server, db);
+  const transport = new WebStandardStreamableHTTPServerTransport({ sessionIdGenerator: undefined });
+  await server.connect(transport);
+  return transport.handleRequest(raw, { parsedBody });
+}
+
+const allowedMcpHosts = ['localhost', '127.0.0.1', '[::1]', 'university-admission-api.aside-hazle6287.workers.dev'];
+const mcpApp = createMcpHonoApp({ allowedHosts: allowedMcpHosts, allowedOrigins: allowedMcpHosts });
+mcpApp.all('/mcp', c => handleMcp(c.req.raw, undefined, (c.env as Env).DB));
+app.route('/', mcpApp);
 
 app.openapi(universityInfoRoute, async c => {
   const body = c.req.valid('json');
@@ -442,6 +585,18 @@ app.openapi(universityInfoRoute, async c => {
       where.push('r.admission_round = ?');
       params.push(body.round);
     }
+    if (body.selection_method) {
+      where.push('r.selection_method = ?');
+      params.push(body.selection_method);
+    }
+    if (body.selection_target) {
+      where.push('r.selection_target = ?');
+      params.push(body.selection_target);
+    }
+    if (body.quota_type) {
+      where.push('r.quota_type = ?');
+      params.push(body.quota_type);
+    }
 
     const recordResult = await c.env.DB.prepare(
       `SELECT r.* FROM admission_records r
@@ -462,12 +617,18 @@ app.openapi(universityInfoRoute, async c => {
       const mine = records.filter(record => record.unv_cd === university.unv_cd);
       const years: Record<string, number> = {};
       const rounds: Record<string, number> = {};
+      const methods: Record<string, number> = {};
+      const targets: Record<string, number> = {};
+      const quotas: Record<string, number> = {};
       const count = (map: Record<string, number>, key: string | null) => {
         if (key !== null) map[key] = (map[key] ?? 0) + 1;
       };
       for (const record of mine) {
         count(years, record.admission_year === null ? null : String(record.admission_year));
         count(rounds, record.admission_round);
+        count(methods, record.selection_method);
+        count(targets, record.selection_target);
+        count(quotas, record.quota_type);
       }
       return {
         unv_cd: university.unv_cd,
@@ -478,6 +639,9 @@ app.openapi(universityInfoRoute, async c => {
         other: mine.filter(record => record.record_type === 'other').length,
         years,
         rounds,
+        selection_methods: methods,
+        selection_targets: targets,
+        quota_types: quotas,
       };
     });
 
@@ -500,9 +664,16 @@ app.doc('/openapi', {
   openapi: '3.0.0',
   info: {
     title: '대학 입시 정보 통합 API',
-    version: '1.0.0',
-    description: '대학 이름으로 심사기준·입시결과 등 수집·정규화된 정보를 조회합니다.',
+    version: '1.1.0',
+    description: '대학 이름으로 심사기준·입시결과 등 수집·정규화된 정보를 조회합니다.\n\nMCP 클라이언트는 같은 Worker의 /mcp 엔드포인트에 Streamable HTTP로 연결하고 search_universities, list_university_selections, get_admission_record 도구를 사용할 수 있습니다.',
   },
+  servers: [{ url: 'https://university-admission-api.aside-hazle6287.workers.dev' }],
+  tags: [
+    { name: '시스템', description: '서비스 상태 확인' },
+    { name: '대학', description: '대학 목록과 통합 입시 정보 조회' },
+    { name: '모집시기', description: '수시/정시 단위 요약 조회' },
+    { name: '전형', description: '전형 분류 목록과 레코드 상세 조회' },
+  ],
 });
 app.get('/swagger', swaggerUI({ url: '/openapi' }));
 app.get('/', c => c.redirect('/swagger'));

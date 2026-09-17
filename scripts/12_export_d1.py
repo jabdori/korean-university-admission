@@ -5,6 +5,8 @@ import json
 import re
 from pathlib import Path
 
+from classify_selection import classify_selection
+
 PROJ = Path(__file__).resolve().parent.parent
 UNIVS = PROJ / "normalized/univs.csv"
 COVERAGE = PROJ / "normalized/coverage.csv"
@@ -103,6 +105,9 @@ def main():
 
     records = []
     missing = set()
+    methods = {}
+    targets = {}
+    quotas = {}
     with RESULTS.open(encoding="utf-8") as f:
         for line_no, line in enumerate(f, 1):
             task = json.loads(line)
@@ -114,6 +119,10 @@ def main():
                     continue
                 year = record.get("admission_year")
                 confidence = record.get("confidence")
+                method, target, quota = classify_selection(record)
+                methods[method] = methods.get(method, 0) + 1
+                targets[target] = targets.get(target, 0) + 1
+                quotas[quota] = quotas.get(quota, 0) + 1
                 records.append((
                     len(records) + 1, code, name,
                     record.get("record_type", "other"),
@@ -123,6 +132,7 @@ def main():
                     float(confidence) if confidence is not None else None,
                     task["source"], task.get("document_hint"), task.get("model"),
                     json.dumps(record, ensure_ascii=False, separators=(",", ":")),
+                    method, target, quota,
                 ))
 
     if missing:
@@ -140,6 +150,9 @@ def main():
             combined.write(path.read_bytes())
 
     print(f"내보내기 완료: 대학 {len(universities)}, 별칭 {len(alias_rows)}, records {len(records)}")
+    print(f"전형요소: {dict(sorted(methods.items(), key=lambda x: -x[1]))}")
+    print(f"선발대상: {dict(sorted(targets.items(), key=lambda x: -x[1]))}")
+    print(f"정원구분: {dict(sorted(quotas.items(), key=lambda x: str(x[0])))}")
 
 
 if __name__ == "__main__":
