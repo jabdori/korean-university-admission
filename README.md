@@ -58,7 +58,31 @@ API 로컬 개발:
 
 `GET /universities`는 `page`, `limit` 파라미터로 페이지네이션하며 기본 20건, 최대 100건을 반환합니다.
 
-MCP 클라이언트는 같은 배포 주소의 `/mcp`를 Streamable HTTP 서버로 등록하면 됩니다. 기본 도구는 `get_university_info`이고, 보조 도구로 `search_universities`, `list_university_selections`, `get_admission_record`가 있습니다.
+### MCP 사용법
+
+Remote MCP 서버로 연결할 수 있습니다. MCP 주소는 `https://university-admission-api.aside-hazle6287.workers.dev/mcp`입니다.
+
+Claude Desktop 설정 예시 (`claude_desktop_config.json`):
+
+    {
+      "mcpServers": {
+        "university-admission": {
+          "command": "npx",
+          "args": ["-y", "mcp-remote", "https://university-admission-api.aside-hazle6287.workers.dev/mcp"]
+        }
+      }
+    }
+
+Cursor / Windsurf 등 Streamable HTTP를 지원하는 클라이언트는 URL을 직접 등록하면 됩니다.
+
+사용 가능한 도구:
+
+| 도구 | 설명 |
+|---|---|
+| get_university_info | 대학 이름·연도·모집시기·전형 조건으로 통합 조회 (기본 도구) |
+| search_universities | 대학 이름 검색 |
+| list_university_selections | 대학 전형 목록 |
+| get_admission_record | 레코드 ID로 상세 조회 |
 
 ## 전형 표준 분류
 
