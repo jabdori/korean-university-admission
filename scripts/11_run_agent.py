@@ -15,6 +15,7 @@ import re
 import time
 import urllib.error
 import urllib.request
+import unicodedata
 from concurrent.futures import FIRST_COMPLETED, ThreadPoolExecutor, wait
 
 PROJ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -37,7 +38,9 @@ def parse_args():
 
 
 def compact(text):
-    return "".join(text.split())
+    # PDF 추출 결과에 단어 경계 제어 문자(\x01)와 zero-width 문자가 섞여 있다.
+    return "".join(ch for ch in "".join(text.split())
+                   if unicodedata.category(ch) not in ("Cc", "Cf"))
 
 
 def validate_records(task, data, check_quotes=True):
@@ -96,8 +99,12 @@ def request_once(task, prompt, key, model):
         raise RuntimeError(f"RETRYABLE network: {e}") from e
 
     try:
-        text = "".join(part.get("text", "") for part in
-                       body["candidates"][0]["content"]["parts"])
+        candidate = body["candidates"][0]
+        parts = candidate.get("content", {}).get("parts", [])
+        if not parts:
+            reason = candidate.get("finishReason", "EMPTY")
+            raise RuntimeError(f"RETRYABLE empty response: {reason}")
+        text = "".join(part.get("text", "") for part in parts)
         return json.loads(text)
     except (KeyError, IndexError, TypeError, json.JSONDecodeError) as e:
         raise RuntimeError("응답에서 JSON을 찾을 수 없음") from e
