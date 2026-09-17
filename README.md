@@ -1,6 +1,18 @@
-# university 입시데이터 프로젝트
+# 한국 대학 입시 데이터·API 플랫폼
 
-바이브온 2027학년도 서비스대학 목록(161개)을 시작점으로, 대학 입시 공개 데이터 전체(202개 일반대학)를 수집해 정규화 데이터와 원본 문서를 함께 보관하는 프로젝트.
+대입정보포털(adiga.kr)과 대학 입시 사이트의 공개 자료를 수집하고, 원본 문서 구조를 보존한 추출 결과와 검증된 정규화 결과를 함께 관리하는 프로젝트입니다. 정규화된 대학·전형·심사기준 데이터는 Cloudflare Workers D1에 적재되고, Hono API와 MCP(Model Context Protocol) 서버로 조회할 수 있습니다.
+
+현재 배포된 대학 마스터는 캠퍼스/모집 단위 기준 202행이며, 캠퍼스 표기를 제거한 표준 대학 이름 기준으로 185개 대학입니다. GitHub 저장소에는 코드, 마이그레이션, 실행 스크립트와 수집 리포트만 포함하고, `raw/`, `cache/`, `extracted/`, `normalized/` 같은 대용량 생성물은 커밋하지 않습니다. API 키도 항상 환경 변수로만 전달합니다.
+
+## 빠른 시작
+
+API 코드 검증과 로컬 개발:
+
+    npm install
+    npm run typecheck
+    npm run dev
+
+데이터 수집·정규화는 uv 격리 환경을 사용합니다. 전체 흐름은 아래 "원본 문서 구조 보존 추출"과 "재실행·확장"을 참고하세요.
 
 ## 디렉토리 구조
 
@@ -20,7 +32,9 @@
 │   ├── sirha/{연도}/       심사기준 조각 HTML (동일 구성)
 │   ├── popup_detail/       대학별 입시결과 상세 팝업 HTML
 │   └── univ_detail/        대학정보 페이지 HTML (모집요강 링크 출처)
-└── scripts/                수집·정규화 스크립트 (표준 라이브러리만 사용)
+├── scripts/                수집·정규화 스크립트 (표준 라이브러리만 사용)
+├── src/                    Cloudflare Workers API (Hono + Swagger + MCP)
+└── migrations/             D1 스키마 마이그레이션
 ```
 
 ## 데이터 소스와 방법
@@ -98,6 +112,8 @@ Cloudflare Worker + D1 + Hono로 배포한다. 정규화된 대학 마스터, �
 - 전형 목록: GET /universities/{unvCd}/selections
 - 레코드 상세: GET /records/{id}
 - MCP Streamable HTTP: POST /mcp (기본 도구: get_university_info, 보조 도구: search_universities, list_university_selections, get_admission_record)
+
+대학 목록(GET /universities)은 page, limit 파라미터로 페이지네이션하며 기본 20건, 최대 100건을 반환한다. Swagger UI의 /universities/info 미리보기는 대형 페이로드 렌더링 방지를 위해 records를 화면 표시용 20개로 제한하지만, 실제 API와 MCP 응답은 전체를 반환한다.
 
 전형 표준 분류는 admission_records에 3개 컬럼으로 저장한다.
 
