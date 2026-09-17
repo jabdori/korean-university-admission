@@ -1,6 +1,6 @@
 # Korean University Admission Data & API
 
-한국 대학 입시 공개 자료를 수집·정규화하고, Cloudflare Workers D1과 Hono API로 조회할 수 있는 플랫폼입니다.
+한국 대학 입시 공개 자료를 수집·정규화하고, Cloudflare Workers D1과 Hono API로 조회할 수 있는 프로젝트입니다.
 
 대입정보포털(adiga.kr)과 대학 입시 사이트의 공개 자료를 수집해 구조화된 데이터로 변환하고, MCP(Model Context Protocol) 서버를 통해 LLM이 활용할 수 있는 형태로 제공합니다.
 
