@@ -110,6 +110,11 @@ def call_api(task, prompt, key, model):
             data = request_once(task, prompt, key, model)
             validate_records(task, data)
             return data
+        except ValueError:
+            # 모델이 근거 quote를 요약하는 경우가 있어 재호출하면 통과한다.
+            if attempt >= 2:
+                raise
+            time.sleep(2)
         except RuntimeError as e:
             if attempt == 3 or not str(e).startswith(("RATE_LIMIT", "RETRYABLE")):
                 raise
