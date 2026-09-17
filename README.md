@@ -29,7 +29,14 @@ API 로컬 개발:
 
 ## API
 
-배포 주소: https://university-admission-api.aside-hazle6287.workers.dev
+**배포 주소**: https://university-admission-api.aside-hazle6287.workers.dev
+
+**문서**:
+
+- [Swagger UI](https://university-admission-api.aside-hazle6287.workers.dev/swagger) — 대화형 API 문서, 직접 요청 테스트 가능
+- [OpenAPI 스펙](https://university-admission-api.aside-hazle6287.workers.dev/openapi) — 기계 판독용 OpenAPI 3.0 JSON
+
+로컬 개발 시: npm run dev 실행 후 http://localhost:8787/swagger 접속
 
 | 엔드포인트 | 설명 |
 |---|---|
@@ -91,4 +98,3 @@ MCP 클라이언트는 같은 배포 주소의 `/mcp`를 Streamable HTTP 서버�
     uv run --python .venv-ocr/bin/python python scripts/12_export_d1.py
     npx wrangler d1 execute university-admission --remote --file=.d1/seed/all.sql
     npm run deploy
-
