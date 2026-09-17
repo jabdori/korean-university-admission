@@ -11,7 +11,6 @@ const RoundSchema = z.enum(['수시', '정시', '기타', '미상']);
 const SelectionMethodSchema = z.enum(['학생부교과', '학생부종합', '논술', '실기', '수능', '기타']);
 const SelectionTargetSchema = z.enum(['일반', '지역인재', '농어촌', '기회균형', '특성화고', '특수교육', '특기자', '재직성인', '기타']);
 const QuotaTypeSchema = z.enum(['정원내', '정원외']);
-const PayloadSchema = z.record(z.string(), z.unknown());
 
 const RequestSchema = z.object({
   universities: z.array(z.string().trim().min(1, '대학 이름은 비워 둘 수 없습니다.'))
@@ -48,24 +47,6 @@ const UniversitySchema = z.object({
   university_site_material_count: z.number().int().describe('대학 사이트에서 직접 수집한 자료 수.'),
 });
 
-const AdmissionRecordSchema = z.object({
-  id: z.number().int().describe('입시 레코드 고유 번호.'),
-  unv_cd: z.string().describe('대학/캠퍼스 고유 코드.'),
-  record_type: RecordTypeSchema.describe('레코드 종류. criteria=심사기준, result=입시결과, other=기타 안내.'),
-  admission_year: z.number().int().nullable().describe('입시 연도(학년도).'),
-  admission_round: z.string().nullable().describe('모집시기. 수시, 정시 등.'),
-  selection_name: z.string().nullable().describe('원문에 나온 하위 전형명.'),
-  selection_method: SelectionMethodSchema.describe('주 전형요소 표준 분류.'),
-  selection_target: SelectionTargetSchema.describe('선발 대상 표준 분류.'),
-  quota_type: QuotaTypeSchema.nullable().describe('정원 구분. 문서에 근거가 없으면 null.'),
-  recruitment_unit: z.string().nullable().describe('모집 단위/학과. 예: 소프트웨어학부, 전 모집단위.'),
-  confidence: z.number().nullable().describe('추출 신뢰도. 0~1.'),
-  source: z.string().describe('원본 문서 경로.'),
-  document_hint: z.string().nullable().describe('추출 작업에 사용한 문서 종류 힌트.'),
-  model: z.string().nullable().describe('정규화에 사용한 AI 모델 이름.'),
-  payload: PayloadSchema.describe('정규화된 원본 payload. 하위호환용이며, 최상위 상세 필드와 중복될 수 있다.'),
-});
-
 const StageElementSchema = z.object({
   name: z.string().describe('전형 요소 이름. 예: 학생부교과, 면접평가.'),
   weight_percent: z.number().nullable().describe('해당 요소의 반영 비율(%). 명시되지 않으면 null.'),
@@ -95,9 +76,14 @@ const EvidenceSchema = z.object({
   quote: z.string().describe('정보 추출 근거가 되는 원문 인용.'),
 });
 
-// 정규화 payload 안의 전형 상세 필드를 최상위로 펼친 스키마.
-// 원본 payload도 하위호환을 위해 함께 반환한다.
-const DetailSchema = z.object({
+// 정규화 결과 원본이다. 품질 검증과 LLM 활용을 위해 payload 그대로 반환한다.
+const PayloadSchema = z.object({
+  record_type: RecordTypeSchema.describe('레코드 종류. criteria=심사기준, result=입시결과, other=기타 안내.'),
+  university_name: z.string().describe('정규화 당시 파악한 대학 이름.'),
+  admission_year: z.number().int().nullable().describe('입시 연도(학년도).'),
+  admission_round: z.string().nullable().describe('모집시기. 수시, 정시 등.'),
+  selection_name: z.string().nullable().describe('원문에 나온 하위 전형명.'),
+  recruitment_unit: z.string().nullable().describe('모집 단위/학과. 예: 소프트웨어학부, 전 모집단위.'),
   eligibility: z.array(z.string()).optional().describe('지원자격 조건 문구.'),
   stages: z.array(StageSchema).optional().describe('전형 단계, 방식, 요소별 반영 비율.'),
   sat_minimum: z.object({
@@ -108,15 +94,34 @@ const DetailSchema = z.object({
   documents: z.array(z.string()).optional().describe('제출 서류 문구.'),
   metrics: z.array(MetricSchema).optional().describe('모집인원, 경쟁률, 합격자 성적 등 수치.'),
   evidence: z.array(EvidenceSchema).optional().describe('원본 문서 위치와 인용 문구.'),
+  confidence: z.number().nullable().describe('추출 신뢰도. 0~1.'),
   notes: z.array(z.string()).optional().describe('원문에서 추출한 참고 사항.'),
-});
+}).passthrough();
+type Payload = z.infer<typeof PayloadSchema>;
 
-const DetailedRecordSchema = AdmissionRecordSchema.merge(DetailSchema);
+const AdmissionRecordSchema = z.object({
+  id: z.number().int().describe('입시 레코드 고유 번호.'),
+  unv_cd: z.string().describe('대학/캠퍼스 고유 코드.'),
+  university_name: z.string().describe('대학 이름.'),
+  record_type: RecordTypeSchema.describe('레코드 종류. criteria=심사기준, result=입시결과, other=기타 안내.'),
+  admission_year: z.number().int().nullable().describe('입시 연도(학년도).'),
+  admission_round: z.string().nullable().describe('모집시기. 수시, 정시 등.'),
+  selection_name: z.string().nullable().describe('원문에 나온 하위 전형명.'),
+  selection_method: SelectionMethodSchema.describe('주 전형요소 표준 분류.'),
+  selection_target: SelectionTargetSchema.describe('선발 대상 표준 분류.'),
+  quota_type: QuotaTypeSchema.nullable().describe('정원 구분. 문서에 근거가 없으면 null.'),
+  recruitment_unit: z.string().nullable().describe('모집 단위/학과. 예: 소프트웨어학부, 전 모집단위.'),
+  confidence: z.number().nullable().describe('추출 신뢰도. 0~1.'),
+  source: z.string().describe('원본 문서 경로.'),
+  document_hint: z.string().nullable().describe('추출 작업에 사용한 문서 종류 힌트.'),
+  model: z.string().nullable().describe('정규화에 사용한 AI 모델 이름.'),
+  payload: PayloadSchema.describe('정규화된 원본 결과. 지원자격, 전형 단계, 평가 기준, 수치, 원문 근거를 포함한다.'),
+});
 
 const ResponseSchema = z.object({
   request: RequestSchema.describe('실제 적용된 조회 조건.'),
   universities: z.array(UniversitySchema).describe('이름 조건과 매칭된 대학/캠퍼스 목록.'),
-  records: z.array(DetailedRecordSchema).describe('조건에 맞는 입시 레코드 전체. 대학 이름만 보내면 보유 데이터 전체.'),
+  records: z.array(AdmissionRecordSchema).describe('조건에 맞는 입시 레코드 전체. 정규화 원본 payload를 포함한다.'),
   summaries: z.array(z.object({
     unv_cd: z.string().describe('대학/캠퍼스 고유 코드.'),
     display_name: z.string().describe('대학/캠퍼스 표시 이름.'),
@@ -165,7 +170,7 @@ const SelectionsResponseSchema = z.object({
 });
 
 const RecordResponseSchema = z.object({
-  record: DetailedRecordSchema.describe('입시 레코드 상세 정보.'),
+  record: AdmissionRecordSchema.describe('입시 레코드 상세 정보. 정규화 원본 payload를 포함한다.'),
 });
 
 const app = new OpenAPIHono<{ Bindings: Env }>({
@@ -413,12 +418,12 @@ app.openapi(universitySelectionsRoute, async c => {
   }
 });
 
-// 단일 레코드 상세 — payload의 전형 상세(단계, 지원자격 등)를 최상위로 펼쳐 반환.
+// 단일 레코드 상세 — 정규화 원본 payload를 그대로 반환한다.
 const recordDetailRoute = createRoute({
   method: 'get',
   path: '/records/{id}',
   summary: '입시 레코드 상세 조회',
-  description: '단일 레코드의 표준 분류, 원본 payload, 지원자격, 전형 단계, 수능 최저, 평가 기준, 근거 문구를 함께 반환합니다.',
+  description: '단일 레코드의 표준 분류와 정규화 원본 payload를 함께 반환합니다. 지원자격, 전형 단계, 수능 최저, 평가 기준, 근거 문구는 payload 안에 있습니다.',
   tags: ['전형'],
   request: {
     params: z.object({ id: z.coerce.number().int().min(1, '레코드 ID는 1 이상이어야 합니다.').describe('입시 레코드 고유 번호.') }),
@@ -439,8 +444,8 @@ app.openapi(recordDetailRoute, async c => {
     ).bind(id).first<AdmissionRecordRow>();
     if (!row) return c.json({ error: '레코드를 찾을 수 없습니다.' }, 404);
 
-    const payload = JSON.parse(row.payload) as Record<string, unknown>;
-    return c.json({ record: { ...row, payload, ...pickDetail(payload) } }, 200);
+    const payload = JSON.parse(row.payload) as Payload;
+    return c.json({ record: { ...row, payload } }, 200);
   } catch {
     return c.json({ error: '레코드 조회에 실패했습니다.' }, 500);
   }
@@ -477,6 +482,7 @@ type UniversityRow = {
 type AdmissionRecordRow = {
   id: number;
   unv_cd: string;
+  university_name: string;
   record_type: 'criteria' | 'result' | 'other';
   admission_year: number | null;
   admission_round: string | null;
@@ -491,16 +497,6 @@ type AdmissionRecordRow = {
   model: string | null;
   payload: string;
 };
-
-// payload에서 전형 상세 필드만 골라 최상위로 펼친다.
-function pickDetail(payload: Record<string, unknown>) {
-  const keys = ['eligibility', 'stages', 'sat_minimum', 'evaluation', 'documents', 'metrics', 'evidence', 'notes'] as const;
-  const detail: Record<string, unknown> = {};
-  for (const key of keys) {
-    if (payload[key] !== undefined) detail[key] = payload[key];
-  }
-  return detail;
-}
 
 // MCP 도구는 HTTP API와 같은 D1 조회를 사용한다. 응답은 MCP 텍스트 콘텐츠로 감싼다.
 function toolJson(value: unknown) {
@@ -519,14 +515,7 @@ function registerAdmissionTools(server: McpServer, db: D1Database) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(input),
     }, { DB: db });
-    const value = await response.json() as {
-      records?: Array<{ payload?: unknown } & Record<string, unknown>>;
-    } & Record<string, unknown>;
-
-    // 상세 필드는 최상위에 이미 펼쳐 두므로 원본 payload 중복은 LLM 컨텍스트에서 제외한다.
-    if (Array.isArray(value.records)) {
-      value.records = value.records.map(({ payload: _payload, ...record }) => record);
-    }
+    const value = await response.json() as Record<string, unknown>;
     return toolJson(value);
   });
 
@@ -589,13 +578,13 @@ function registerAdmissionTools(server: McpServer, db: D1Database) {
   }, async ({ id }) => {
     const row = await db.prepare('SELECT * FROM admission_records WHERE id = ?').bind(id).first<AdmissionRecordRow>();
     if (!row) return toolJson({ error: '레코드를 찾을 수 없습니다.' });
-    const payload = JSON.parse(row.payload) as Record<string, unknown>;
-    return toolJson({ record: { ...row, payload, ...pickDetail(payload) } });
+    const payload = JSON.parse(row.payload) as Payload;
+    return toolJson({ record: { ...row, payload } });
   });
 }
 
 async function handleMcp(raw: Request, parsedBody: unknown, db: D1Database) {
-  const server = new McpServer({ name: 'university-admission-api', version: '1.3.0' });
+  const server = new McpServer({ name: 'university-admission-api', version: '1.4.0' });
   registerAdmissionTools(server, db);
   const transport = new WebStandardStreamableHTTPServerTransport({ sessionIdGenerator: undefined });
   await server.connect(transport);
@@ -674,14 +663,10 @@ app.openapi(universityInfoRoute, async c => {
     ).bind(...params).all<AdmissionRecordRow>();
     const rows = recordResult.results ?? [];
 
-    const records = rows.map(row => {
-      const payload = JSON.parse(row.payload) as Record<string, unknown>;
-      return {
+    const records = rows.map(row => ({
       ...row,
-      payload,
-      ...pickDetail(payload),
-      };
-    });
+      payload: JSON.parse(row.payload) as Payload,
+    }));
     const summaries = universities.map(university => {
       const mine = records.filter(record => record.unv_cd === university.unv_cd);
       const years: Record<string, number> = {};
@@ -733,7 +718,7 @@ app.doc('/openapi', {
   openapi: '3.0.0',
   info: {
     title: '대학 입시 정보 통합 API',
-    version: '1.3.0',
+    version: '1.4.0',
     description: '대학 이름으로 심사기준·입시결과 등 수집·정규화된 정보를 조회합니다.\n\nMCP 클라이언트는 같은 Worker의 /mcp 엔드포인트에 Streamable HTTP로 연결할 수 있습니다. 대학·모집시기·전형 분류 조건을 한 번에 넘기면 get_university_info 도구가 하위 전형·모집단위·전형 단계·평가 기준·근거를 통째로 반환합니다. search_universities, list_university_selections, get_admission_record는 보조 조회용입니다.',
   },
   servers: [{ url: 'https://university-admission-api.aside-hazle6287.workers.dev' }],
