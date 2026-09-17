@@ -1,0 +1,13 @@
+{
+  "name": "university-admission-api",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-09-17",
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "university-admission",
+      "database_id": "1addd103-fbc9-4288-b8af-8931edba5c10",
+      "migrations_dir": "./migrations"
+    }
+  ]
+}

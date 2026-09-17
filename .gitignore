@@ -5,3 +5,6 @@ cache/
 normalized/
 extracted/
 .venv-ocr/
+node_modules/
+.wrangler/
+.d1/

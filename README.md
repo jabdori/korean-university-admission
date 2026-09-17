@@ -84,6 +84,33 @@
 
 출력은 normalized/agent_results.jsonl(task별 records)과 normalized/agent_errors.jsonl(실패 원인)이다. 응답은 records 배열 형식, record_type, evidence 존재, locator 일치, quote가 task 원문에 존재하는지 검증한다.
 
+## 대학 입시 정보 API
+
+Cloudflare Worker + D1 + Hono로 배포한다. 정규화된 대학 마스터, 검색용 별칭, 심사기준/입시결과 records를 하나의 응답으로 반환한다.
+
+- 배포 주소: https://university-admission-api.aside-hazle6287.workers.dev
+- 상태 확인: GET /health
+- OpenAPI 문서: GET /openapi
+- Swagger UI: GET /swagger
+- 통합 조회: POST /universities/info
+
+요청 예시는 다음과 같다. record_type, year, round는 선택 필터다.
+
+    curl -sS -X POST https://university-admission-api.aside-hazle6287.workers.dev/universities/info -H 'Content-Type: application/json' -d '{"universities":["제주대학교","한림대학교"],"record_type":"criteria","year":2027,"round":"수시"}'
+
+응답은 요청 정보, 매칭된 대학 목록, 원본 근거 경로가 포함된 records, 대학별 요약(summaries), 찾지 못한 이름(not_found)으로 구성된다. 대학 이름은 최대 10개까지 요청할 수 있다.
+
+API 개발과 배포:
+
+    npm install
+    npm run typecheck
+    npx wrangler d1 migrations apply university-admission --remote
+    uv run --python .venv-ocr/bin/python python scripts/12_export_d1.py
+    npx wrangler d1 execute university-admission --remote --file=.d1/seed/all.sql
+    npm run deploy
+
+주의: 12번 스크립트가 만드는 .d1/seed/all.sql은 D1의 admission_records, university_aliases, universities 데이터를 모두 삭제한 뒤 다시 삽입한다. 따라서 D1에 직접 수정한 데이터가 있으면 먼저 백업해야 한다.
+
 ## 미확보 51개 대학 요약 (raw/univ_dist 없음)
 
 - 포털 빈 조각 3개: 위 참조
@@ -129,12 +156,12 @@
 
 | 작업 | 명령 |
 |---|---|
-| 대학 목록 갱신 | `python3 scripts/01_univs.py [결과연도]` |
-| 심사기준+입결 수집 | `TIME_LIMIT=100 python3 scripts/02_fetch_items.py [연도]` 반복 |
-| 정규화 | `python3 scripts/03_parse.py [연도]` |
-| 추가안내자료 | `python3 scripts/04_download_attachments.py` |
-| 모집요강 | `TIME_LIMIT=100 python3 scripts/05_download_yogang.py [연도]` 반복 |
-| 대학사이트 정적 탐색 | `python3 scripts/06_dist_crawler.py [--only 대학명]` |
-| 매니페스트 재생성 | `python3 scripts/07_make_manifest.py` |
+| 대학 목록 갱신 | `uv run python scripts/01_univs.py [결과연도]` |
+| 심사기준+입결 수집 | `TIME_LIMIT=100 uv run python scripts/02_fetch_items.py [연도]` 반복 |
+| 정규화 | `uv run python scripts/03_parse.py [연도]` |
+| 추가안내자료 | `uv run python scripts/04_download_attachments.py` |
+| 모집요강 | `TIME_LIMIT=100 uv run python scripts/05_download_yogang.py [연도]` 반복 |
+| 대학사이트 정적 탐색 | `uv run python scripts/06_dist_crawler.py [--only 대학명]` |
+| 매니페스트 재생성 | `uv run python scripts/07_make_manifest.py` |
 
 주의: macOS timeout 명령이 없으므로 TIME_LIMIT 환경변수(초)를 사용. 스크립트는 캐시 스킵 방식이라 재실행 시 이어서 진행됨.
