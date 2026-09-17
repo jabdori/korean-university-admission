@@ -27,7 +27,7 @@ API = "https://generativelanguage.googleapis.com/v1beta/models/{model}:generateC
 
 def parse_args():
     p = argparse.ArgumentParser()
-    p.add_argument("--model", default="gemini-3.6-flash")
+    p.add_argument("--model", default="gemini-3.5-flash-lite")
     p.add_argument("--workers", type=int, default=2)
     p.add_argument("--limit", type=int, default=0, help="0이면 전체")
     p.add_argument("--ids", help="쉼표로 구분된 task id만 실행")
