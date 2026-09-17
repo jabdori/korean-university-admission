@@ -66,21 +66,21 @@
       "paddleocr==3.7.0" "paddlepaddle==3.3.1" "paddlex[ocr]==3.7.2" \
       "pymupdf==1.28.2" "openpyxl==3.1.5" "pyhwp==0.1b15" "xlrd==2.0.2"
 
-    .venv-ocr/bin/python scripts/08_extract_docs.py
+    uv run --python .venv-ocr/bin/python python scripts/08_extract_docs.py
     PADDLE_PDX_DISABLE_MODEL_SOURCE_CHECK=True \
-      .venv-ocr/bin/python scripts/09_ocr_extract.py 0 45
+      uv run --python .venv-ocr/bin/python python scripts/09_ocr_extract.py 0 45
     PADDLE_PDX_DISABLE_MODEL_SOURCE_CHECK=True \
-      .venv-ocr/bin/python scripts/09_ocr_extract.py 45 45
-    .venv-ocr/bin/python scripts/10_make_agent_tasks.py
+      uv run --python .venv-ocr/bin/python python scripts/09_ocr_extract.py 45 45
+    uv run --python .venv-ocr/bin/python python scripts/10_make_agent_tasks.py
 
-08번은 원본을 extracted/ 아래 동일 상대경로 + .json으로 저장하고 스캔 PDF는 extracted/_ocr_queue.json에 남긴다. 09번은 OCR 결과와 PaddleOCR 원 결과(.raw.json)를 함께 저장한다. 10번은 키워드 블록을 근거 위치(locator)와 함께 최대 12,000자 task로 나눠 normalized/agent_tasks.jsonl과 normalized/agent_prompt.md를 만든다. 현재 4,571개 task가 생성되었고, OCR 완료 후 재실행하면 대기 문서가 자동 포함된다.
+08번은 원본을 extracted/ 아래 동일 상대경로 + .json으로 저장하고 스캔 PDF는 extracted/_ocr_queue.json에 남긴다. 09번은 한국어 인식 모델로 페이지를 한 장씩 처리하고 OCR 결과와 PaddleOCR 원 결과(.raw.json)를 함께 저장한다. 10번은 키워드 블록을 근거 위치(locator)와 함께 최대 12,000자 task로 나눠 normalized/agent_tasks.jsonl과 normalized/agent_prompt.md를 만든다. 현재 4,571개 task가 생성되었고, OCR 완료 후 재실행하면 대기 문서가 자동 포함된다.
 
 11번은 Gemini API로 task를 정규화한다. API 키는 GEMINI_API_KEY 환경 변수로만 전달하고 파일·커밋에 저장하지 않는다. 성공한 task는 재실행 시 스킵하므로 rate limit으로 중단되어도 같은 명령을 다시 실행하면 이어진다.
 기본 모델은 gemini-3.5-flash-lite이며 --model로 변경할 수 있다.
 
-    GEMINI_API_KEY=... python3 scripts/11_run_agent.py --limit 2
-    GEMINI_API_KEY=... python3 scripts/11_run_agent.py --workers 2
-    python3 scripts/11_run_agent.py --check
+    GEMINI_API_KEY=... uv run --python .venv-ocr/bin/python python scripts/11_run_agent.py --limit 2
+    GEMINI_API_KEY=... uv run --python .venv-ocr/bin/python python scripts/11_run_agent.py --workers 2
+    uv run --python .venv-ocr/bin/python python scripts/11_run_agent.py --check
 
 출력은 normalized/agent_results.jsonl(task별 records)과 normalized/agent_errors.jsonl(실패 원인)이다. 응답은 records 배열 형식, record_type, evidence 존재, locator 일치, quote가 task 원문에 존재하는지 검증한다.
 
