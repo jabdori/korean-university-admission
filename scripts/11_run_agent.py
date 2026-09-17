@@ -9,6 +9,7 @@
 """
 import argparse
 import datetime
+import html
 import json
 import os
 import re
@@ -38,8 +39,8 @@ def parse_args():
 
 
 def compact(text):
-    # PDF 추출 결과에 단어 경계 제어 문자(\x01)와 zero-width 문자가 섞여 있다.
-    return "".join(ch for ch in "".join(text.split())
+    # PDF 제어 문자와 HWP의 HTML 개체 참조(&#13; 등)를 함께 정규화한다.
+    return "".join(ch for ch in "".join(html.unescape(text).split())
                    if unicodedata.category(ch) not in ("Cc", "Cf"))
 
 
